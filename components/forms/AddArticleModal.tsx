@@ -18,6 +18,7 @@ export default function AddArticleModal({ formId, onArticleAdded }: Props) {
   const [selectedSizes, setSelectedSizes] = useState<string[]>(ADULT_SIZES);
   const [articleType, setArticleType] = useState<"BASIC" | "EXTRA">("BASIC");
   const [imageUrl, setImageUrl] = useState("");
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const handleAddArticle = async (formData: FormData) => {
     setError(null);
@@ -49,6 +50,7 @@ export default function AddArticleModal({ formId, onArticleAdded }: Props) {
     setSelectedSizes(ADULT_SIZES);
     setArticleType("BASIC");
     setImageUrl("");
+    setImagePreview(null);
     onArticleAdded();
   };
 
@@ -71,6 +73,7 @@ export default function AddArticleModal({ formId, onArticleAdded }: Props) {
                   setIsModalOpen(false);
                   setError(null);
                   setSelectedSizes(ADULT_SIZES);
+                  setImagePreview(null);
                 }}
                 className="text-gray-400 hover:text-gray-600 text-xl"
               >
@@ -132,28 +135,75 @@ export default function AddArticleModal({ formId, onArticleAdded }: Props) {
                 placeholder="SKU (optional)"
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-brand-green"
               />
-              <input
-                type="number"
-                name="defaultPrice"
-                placeholder="Price (e.g. 25.00)"
-                step="0.01"
-                min="0"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-brand-green"
-              />
-
-              <input
-                type="file"
-                name="image"
-                accept="image/*"
-                className="w-full text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border file:border-gray-200 file:text-sm file:bg-white file:text-brand-navy hover:file:bg-gray-50 file:cursor-pointer"
-              />
-              {imageUrl && (
-                <img
-                  src={imageUrl}
-                  alt="Preview"
-                  className="h-20 object-contain rounded"
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                  €
+                </span>
+                <input
+                  type="number"
+                  name="defaultPrice"
+                  placeholder="Price (e.g. 25.00)"
+                  step="0.01"
+                  min="0"
+                  className="w-full border border-gray-200 rounded-lg pl-7 pr-3 py-2 text-sm outline-none focus:border-brand-green"
                 />
-              )}
+              </div>
+
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-brand-navy">
+                  Article Image
+                </p>
+                <label className="flex flex-col items-center justify-center w-full border-2 border-dashed border-gray-200 rounded-xl p-4 cursor-pointer hover:border-brand-navy hover:bg-gray-50 transition-colors group">
+                  {imagePreview ? (
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="h-28 object-contain rounded-lg"
+                    />
+                  ) : (
+                    <>
+                      <svg
+                        className="w-8 h-8 text-gray-300 group-hover:text-brand-navy transition-colors mb-2"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={1.5}
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3 19.5h18M3.75 4.5h16.5a.75.75 0 01.75.75v13.5a.75.75 0 01-.75.75H3.75a.75.75 0 01-.75-.75V5.25a.75.75 0 01.75-.75z"
+                        />
+                      </svg>
+                      <span className="text-sm text-gray-400 group-hover:text-brand-navy transition-colors">
+                        Click to upload an image
+                      </span>
+                      <span className="text-xs text-gray-300 mt-0.5">
+                        PNG, JPG, WEBP — max 5 MB
+                      </span>
+                    </>
+                  )}
+                  <input
+                    type="file"
+                    name="image"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) setImagePreview(URL.createObjectURL(file));
+                    }}
+                  />
+                </label>
+                {imagePreview && (
+                  <button
+                    type="button"
+                    onClick={() => setImagePreview(null)}
+                    className="text-xs text-gray-400 hover:text-red-500 transition-colors"
+                  >
+                    Remove image
+                  </button>
+                )}
+              </div>
 
               <div className="space-y-2">
                 <p className="text-sm font-medium text-brand-navy">Sizes</p>
@@ -213,21 +263,22 @@ export default function AddArticleModal({ formId, onArticleAdded }: Props) {
 
               <div className="flex gap-2 pt-2">
                 <button
-                  type="submit"
-                  className="flex-1 bg-brand-navy text-white py-2 rounded-lg text-sm hover:bg-brand-green transition-colors"
-                >
-                  Add Article
-                </button>
-                <button
                   type="button"
                   onClick={() => {
                     setIsModalOpen(false);
                     setError(null);
                     setSelectedSizes(ADULT_SIZES);
+                    setImagePreview(null);
                   }}
                   className="flex-1 border border-gray-200 text-gray-600 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors"
                 >
                   Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 bg-brand-navy text-white py-2 rounded-lg text-sm hover:bg-brand-green transition-colors"
+                >
+                  Add Article
                 </button>
               </div>
             </form>

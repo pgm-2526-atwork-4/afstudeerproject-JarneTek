@@ -35,9 +35,21 @@ export default function FormDetailPage() {
     <div className="flex-1 flex overflow-hidden">
       <div className="w-80 flex-shrink-0 flex flex-col border-r border-gray-200 bg-white overflow-hidden">
         <div className="p-4 border-b border-gray-100">
-          <h2 className="font-bold text-brand-navy text-sm">Form Articles</h2>
-          <p className="text-xs text-gray-400">
-            Template: {form.targetGroups.join(", ")}
+          <div className="flex items-center justify-between">
+            <h2 className="font-bold text-brand-navy text-sm">Kit Articles</h2>
+            <div className="group relative flex items-center">
+              <div className="w-4 h-4 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-[10px] font-bold cursor-help hover:bg-brand-navy hover:text-white transition-colors">
+                i
+              </div>
+              <div className="absolute right-0 top-7 w-72 p-3 bg-brand-navy text-white text-xs rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 leading-relaxed">
+                Add articles to this kit. Mark them as <strong>Basic</strong>{" "}
+                (included in the membership fee) or <strong>Extra</strong>{" "}
+                (optional, paid separately).
+              </div>
+            </div>
+          </div>
+          <p className="text-xs text-gray-400 mt-0.5">
+            Target groups: {form.targetGroups.join(", ")}
           </p>
         </div>
 
@@ -105,15 +117,24 @@ export default function FormDetailPage() {
         </div>
       </div>
 
-      {/* Right panel — member preview */}
       <div className="flex-1 flex flex-col overflow-hidden bg-gray-50">
         <div className="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200">
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <span>👁</span>
             <span className="font-medium">Member Preview</span>
+            <div className="group relative flex items-center">
+              <div className="w-4 h-4 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-[10px] font-bold cursor-help hover:bg-brand-navy hover:text-white transition-colors">
+                i
+              </div>
+              <div className="absolute left-0 top-7 w-72 p-3 bg-brand-navy text-white text-xs rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 leading-relaxed">
+                This is exactly what your members will see when they open their
+                personal order link. Use this to verify the kit before sending
+                it out.
+              </div>
+            </div>
           </div>
           <button className="bg-brand-navy text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-green transition-colors">
-            Save Form
+            Save Kit
           </button>
         </div>
 

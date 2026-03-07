@@ -58,91 +58,133 @@ export default function ManualOrderPopUp({
         <h1>Manual Order</h1>
       </button>
       {open && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-4 rounded-lg">
-            <button onClick={() => setOpen(false)}>Close</button>
-            {formItems.map((item) => (
-              <div
-                key={item.id}
-                className="border border-gray-200 rounded-lg p-3 space-y-2"
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={() => setOpen(false)}
+        >
+          <div
+            className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <h2 className="text-lg font-bold text-brand-navy">
+                Manual Order
+              </h2>
+              <button
+                onClick={() => setOpen(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors text-xl leading-none"
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-brand-navy">
-                      {item.name}
-                    </p>
-                    <p className="text-xs text-gray-400">{item.description}</p>
-                  </div>
-                  <p className="text-sm font-semibold">
-                    €{item.defaultPrice.toFixed(2)}
-                  </p>
-                </div>
-                <select
-                  value={size[item.id] || ""}
-                  onChange={(e) =>
-                    setSize({ ...size, [item.id]: e.target.value })
-                  }
-                  className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm outline-none focus:border-brand-green"
-                >
-                  <option value="">Select Size</option>
-                  {item.sizes.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  type="number"
-                  value={quantity[item.id] || 1}
-                  onChange={(e) =>
-                    setQuantity({
-                      ...quantity,
-                      [item.id]: Number(e.target.value),
-                    })
-                  }
-                  min={1}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm outline-none focus:border-brand-green"
-                />
-                <button
-                  onClick={() => setSelectedItems([...selectedItems, item])}
-                  className="w-full bg-brand-navy text-white py-1.5 rounded-lg text-sm hover:bg-brand-green transition-colors"
-                >
-                  Add
-                </button>
-              </div>
-            ))}
+                ✕
+              </button>
+            </div>
 
-            {selectedItems.length > 0 && (
-              <div className="mt-4 border-t border-gray-200 pt-4">
-                <h3 className="font-bold text-brand-navy mb-2">Cart</h3>
-                {selectedItems.map((item, idx) => (
-                  <div key={idx} className="flex justify-between text-sm mb-1">
-                    <span>
-                      {quantity[item.id] || 1}x {item.name} (
-                      {size[item.id] || "No size"})
-                    </span>
-                    <span>
-                      €
-                      {(item.defaultPrice * (quantity[item.id] || 1)).toFixed(
-                        2,
-                      )}
-                    </span>
+            {/* Content */}
+            <div className="px-6 py-5 max-h-[60vh] overflow-y-auto space-y-4">
+              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+                Products
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {formItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className="border border-gray-200 rounded-xl p-4 space-y-3 hover:border-gray-300 transition-colors"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-sm font-semibold text-brand-navy">
+                          {item.name}
+                        </p>
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          {item.description}
+                        </p>
+                      </div>
+                      <span className="text-sm font-bold text-brand-navy bg-gray-50 px-2 py-0.5 rounded-md">
+                        €{item.defaultPrice.toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <select
+                        value={size[item.id] || ""}
+                        onChange={(e) =>
+                          setSize({ ...size, [item.id]: e.target.value })
+                        }
+                        className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green/20 transition-all"
+                      >
+                        <option value="">Size</option>
+                        {item.sizes.map((s) => (
+                          <option key={s} value={s}>
+                            {s}
+                          </option>
+                        ))}
+                      </select>
+                      <input
+                        type="number"
+                        value={quantity[item.id] || 1}
+                        onChange={(e) =>
+                          setQuantity({
+                            ...quantity,
+                            [item.id]: Number(e.target.value),
+                          })
+                        }
+                        min={1}
+                        className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green/20 transition-all"
+                      />
+                    </div>
+                    <button
+                      onClick={() => setSelectedItems([...selectedItems, item])}
+                      className="w-full bg-brand-navy text-white py-2 rounded-lg text-sm font-medium hover:bg-brand-green transition-colors"
+                    >
+                      + Add to Cart
+                    </button>
                   </div>
                 ))}
-                <div className="flex justify-between font-bold text-brand-navy mt-2 pt-2 border-t border-gray-100">
-                  <span>Total:</span>
-                  <span>€{totalPrice.toFixed(2)}</span>
-                </div>
               </div>
-            )}
 
-            <button
-              className="w-full bg-brand-navy text-white font-medium py-2 rounded-lg mt-4 disabled:opacity-50"
-              onClick={handleCreateOrder}
-              disabled={selectedItems.length === 0 || loading}
-            >
-              {loading ? "Processing..." : "Create Order"}
-            </button>
+              {selectedItems.length > 0 && (
+                <div className="mt-2 border-t border-gray-200 pt-4">
+                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                    Cart
+                  </h3>
+                  <div className="space-y-2">
+                    {selectedItems.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="flex justify-between items-center text-sm bg-gray-50 rounded-lg px-4 py-2"
+                      >
+                        <span className="text-gray-700">
+                          {quantity[item.id] || 1}x {item.name}{" "}
+                          <span className="text-gray-400">
+                            ({size[item.id] || "No size"})
+                          </span>
+                        </span>
+                        <span className="font-medium text-brand-navy">
+                          €
+                          {(
+                            item.defaultPrice * (quantity[item.id] || 1)
+                          ).toFixed(2)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex justify-between font-bold text-brand-navy mt-3 pt-3 border-t border-gray-100 text-base">
+                    <span>Total:</span>
+                    <span>€{totalPrice.toFixed(2)}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50">
+              <button
+                className="w-full bg-brand-navy text-white font-semibold py-3 rounded-xl hover:bg-brand-green transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={handleCreateOrder}
+                disabled={selectedItems.length === 0 || loading}
+              >
+                {loading ? "Processing..." : "Create Order"}
+              </button>
+            </div>
           </div>
         </div>
       )}

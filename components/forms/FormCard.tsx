@@ -117,17 +117,17 @@ export default function FormCard({
 
               <div className="flex gap-2 pt-2">
                 <button
-                  type="submit"
-                  className="bg-brand-navy text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-green transition-colors"
-                >
-                  Update
-                </button>
-                <button
                   type="button"
                   onClick={() => setMenuOpen(false)}
                   className="border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors"
                 >
                   Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-brand-navy text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-green transition-colors"
+                >
+                  Update
                 </button>
               </div>
             </form>

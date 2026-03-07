@@ -61,3 +61,38 @@ export async function toggleHasPaid(memberId: string) {
     });
     revalidatePath(`/dashboard/members`);
 }
+
+export async function importMembers(membersData: Record<string, string>[], clubId: string) {
+    const session = await getSession();
+    if (!session) {
+        throw new Error("No session found");
+    }
+    const clubUser = await prisma.clubUser.findUnique({
+        where: {
+            userId_clubId: {
+                userId: session.id,
+                clubId: clubId,
+            },
+        },
+    });
+    if (!clubUser) {
+        throw new Error("Not authorized");
+    }
+    const members = membersData.map((member) => {
+        return {
+            firstName: member.firstName,
+            lastName: member.lastName,
+            email: member.email,
+            clubId: clubId,
+            group: member.group,
+            hasPaid: member.hasPaid
+                ? ["true", "ja", "1", "yes"].includes(member.hasPaid.toLowerCase().trim())
+                : false,
+        };
+    });
+
+    await prisma.member.createMany({
+        data: members,
+    });
+    revalidatePath(`/dashboard/members`);
+}

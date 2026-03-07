@@ -1,3 +1,5 @@
+import TestEmailButton from "@/components/mailing/TestEmailButton";
+
 export default function DashboardPage() {
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
@@ -17,6 +19,7 @@ export default function DashboardPage() {
             <button className="bg-brand-navy text-white px-4 py-2 rounded-lg text-sm">
               Start New Fitting Day
             </button>
+            <TestEmailButton />
           </div>
         </div>
       </div>

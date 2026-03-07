@@ -7,19 +7,19 @@ import ClubSelector from "../clubs/clubSelector";
 const navItems = [
   {
     href: "/dashboard",
-    label: "Admin Dashboard",
+    label: "Dashboard",
   },
   {
     href: "/dashboard/form-builder",
-    label: "Form Builder",
+    label: "Kit Builder",
   },
   {
     href: "/dashboard/club-info",
-    label: "Club Info",
+    label: "Club Settings",
   },
   {
     href: "/dashboard/order-overview",
-    label: "Order Overview",
+    label: "Orders",
   },
   {
     href: "/dashboard/members",

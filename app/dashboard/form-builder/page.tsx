@@ -59,13 +59,32 @@ export default function FormBuilderPage() {
       <div className="flex-1 overflow-auto p-6">
         <div className="max-w-5xl mx-auto space-y-6">
           <div>
-            <h1 className="text-2xl font-bold text-brand-navy">Form Builder</h1>
-            <p className="text-gray-500">Manage order forms for your groups</p>
+            <div className="flex items-center gap-2 mb-1">
+              <h1 className="text-2xl font-bold text-brand-navy">
+                Kit Builder
+              </h1>
+              <div className="group relative flex items-center">
+                <div className="w-5 h-5 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-xs font-bold cursor-help hover:bg-brand-navy hover:text-white transition-colors">
+                  i
+                </div>
+                <div className="absolute left-full ml-3 w-72 p-3 bg-brand-navy text-white text-xs rounded-lg shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 leading-relaxed">
+                  A <strong>kit</strong> is a collection of clothing articles
+                  (e.g. shirt, shorts, socks) assigned to one or more member
+                  groups. Members will order directly from their kit via a
+                  personal link.
+                  <div className="absolute top-3 -left-1 w-2 h-2 bg-brand-navy transform rotate-45"></div>
+                </div>
+              </div>
+            </div>
+            <p className="text-gray-500">
+              Create clothing kits for your groups. Each kit contains the
+              articles your members can order.
+            </p>
           </div>
 
           {forms.length === 0 ? (
             <p className="text-gray-400 text-sm">
-              No forms yet. Create your first one below.
+              No kits yet. Create your first one below.
             </p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -89,11 +108,11 @@ export default function FormBuilderPage() {
             action={handleCreateForm}
             className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm space-y-3"
           >
-            <h3 className="font-bold text-brand-navy">New Form</h3>
+            <h3 className="font-bold text-brand-navy">New Kit</h3>
             <input
               type="text"
               name="name"
-              placeholder="Form name (e.g. Eerste Ploeg)"
+              placeholder="Kit name (e.g. First Team 2024)"
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-brand-green"
             />
             <div>
@@ -121,7 +140,7 @@ export default function FormBuilderPage() {
               type="submit"
               className="bg-brand-navy text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-green transition-colors"
             >
-              + Create Form
+              + Create Kit
             </button>
           </form>
         </div>
