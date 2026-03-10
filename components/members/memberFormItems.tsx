@@ -11,23 +11,45 @@ export default function MemberFormItems({
   form,
   token,
 }: {
-  form: FormWithItems;
+  form: Exclude<FormWithItems, null>;
   token: string;
 }) {
-  if (!form) return <div>No form found.</div>;
-
   const [activeTab, setActiveTab] = useState<"basic" | "extra">("basic");
+  const [cartItems, setCartItems] = useState<
+    {
+      formItemId: string;
+      productId: string;
+      size: string;
+      quantity: number;
+      price: number;
+    }[]
+  >([]);
+
+  function handleAddToCart(item: FormWithItems["items"][number], size: string, quantity: number) {
+    setCartItems([...cartItems, { formItemId: item.id, productId: item.product.id, size, quantity, price: item.product.defaultPrice }]);
+  }
+
+  
+
+  if (!form) return <div>No form found.</div>;
 
   const basicItems = form.items.filter((item) => item.type === "BASIC");
   const customItems = form.items.filter((item) => item.type === "EXTRA");
 
   const handleCheckout = async (formData: FormData) => {
-    const items = form.items.map((item) => ({
-      productId: item.product.id,
-      size: formData.get(`size-${item.id}`) as string,
-      quantity: parseInt(formData.get(`quantity-${item.id}`) as string),
-      price: Number(item.customPrice ?? item.product.defaultPrice),
-    }));
+    const items = form.items.map((item) => {
+      const isExtra = item.type === "EXTRA";
+      const itemPrice = isExtra
+        ? Number(item.customPrice ?? item.product.defaultPrice)
+        : 0;
+
+      return {
+        productId: item.product.id,
+        size: formData.get(`size-${item.id}`) as string,
+        quantity: parseInt(formData.get(`quantity-${item.id}`) as string),
+        price: itemPrice,
+      };
+    });
     const totalPrice = items.reduce(
       (acc, item) => acc + item.price * item.quantity,
       0,
@@ -41,14 +63,13 @@ export default function MemberFormItems({
         <button type="button" onClick={() => setActiveTab("basic")}>
           Basic
         </button>
-        
-          <button type="button" onClick={() => setActiveTab("extra")}>
-            Extra
-          </button>
-        
+
+        <button type="button" onClick={() => setActiveTab("extra")}>
+          Extra
+        </button>
       </div>
       {activeTab === "basic" &&
-        basicItems.map((item) => <KitItemCard key={item.id} item={item} />)}
+        basicItems.map((item) => <KitItemCard onAdd={() => {}} key={item.id} item={item} />)}
 
       {activeTab === "extra" && (
         <>
@@ -57,7 +78,7 @@ export default function MemberFormItems({
             select will be charged additionally.
           </div>
           {customItems.map((item) => (
-            <KitItemCard key={item.id} item={item} />
+            <KitItemCard onAdd={() => {}} key={item.id} item={item} />
           ))}
         </>
       )}

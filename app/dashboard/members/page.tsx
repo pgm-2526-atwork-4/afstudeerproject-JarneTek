@@ -6,6 +6,8 @@ import ManualOrderPopUp from "@/components/members/ManualOrderPopUp";
 import CsvImport from "@/components/csv-import/csvImport";
 import { useState, useEffect } from "react";
 import { Member } from "@prisma/client";
+import EditMember from "@/components/members/EditMember";
+import DeleteMember from "@/components/members/DeleteMember";
 
 export default function MembersPage() {
   const { selectedClub } = useClub();
@@ -13,6 +15,7 @@ export default function MembersPage() {
   const [groupFilter, setGroupFilter] = useState("all");
   const [filteredMembers, setFilteredMembers] = useState<Member[]>([]);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [openActionMenu, setOpenActionMenu] = useState<string | null>(null);
 
   useEffect(() => {
     if (selectedClub) {
@@ -39,14 +42,21 @@ export default function MembersPage() {
 
   const allGroups = members.map((m) => m.group);
   const uniqueGroups = new Set(allGroups);
-  const groups = Array.from(uniqueGroups);
+  const groups = Array.from(uniqueGroups).sort((a, b) => {
+    const uA = a.match(/^[Uu](\d+)/);
+    const uB = b.match(/^[Uu](\d+)/);
+    if (uA && uB) return parseInt(uA[1]) - parseInt(uB[1]);
+    if (uA) return -1;
+    if (uB) return 1;
+    return a.localeCompare(b);
+  });
 
   return (
     <div className="flex-1 overflow-auto p-6">
       <div className="max-w-5xl mx-auto space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-brand-navy">Members</h1>
-          <p className="text-gray-500 text-sm">{members.length} leden</p>
+          <p className="text-gray-500 text-sm">{members.length} members</p>
         </div>
 
         <details className="bg-white border border-gray-200 rounded-xl p-6">
@@ -107,8 +117,8 @@ export default function MembersPage() {
                   <th className="px-4 py-3 font-semibold">Member Name</th>
                   <th className="px-4 py-3 font-semibold">Email</th>
                   <th className="px-4 py-3 font-semibold">U-Group</th>
-                  <th className="px-4 py-3 font-semibold">Lidgeld Status</th>
-                  <th className="px-4 py-3 font-semibold">Actions</th>
+                  <th className="px-4 py-3 font-semibold">Payment Status</th>
+                  <th className="px-4 py-3 font-semibold text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -152,13 +162,40 @@ export default function MembersPage() {
                         </div>
                       )}
                     </td>
-                    <td className="px-4 py-3">
-                      <ManualOrderPopUp
-                        memberId={member.id}
-                        clubId={selectedClub.clubId}
-                      />
+                    <td className="px-4 py-3 relative text-right">
+                      <button
+                        onClick={() => setOpenActionMenu(openActionMenu === member.id ? null : member.id)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 text-brand-navy font-medium text-xs rounded-lg hover:bg-gray-50 transition-colors ml-auto"
+                      >
+                        Manage
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${openActionMenu === member.id ? 'rotate-180' : ''}`}><path d="m6 9 6 6 6-6"/></svg>
+                      </button>
+
+                      {openActionMenu === member.id && (
+                        <div className="absolute top-full right-4 mt-2 z-20 w-44 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] border border-gray-100 py-1.5 overflow-hidden origin-top-right text-left">
+                          <EditMember
+                            member={member}
+                            onSuccess={() => getClubMembers(selectedClub.clubId).then(setMembers)}
+                          />
+                          
+                          <div className="w-full hover:bg-gray-50 transition-colors cursor-pointer">
+                            <div className="[&_button]:!border-none [&_button]:!bg-transparent [&_button]:!w-full [&_button]:!text-left [&_button]:!px-4 [&_button]:!py-2.5 [&_button]:!rounded-none [&_button>h1]:!font-normal [&_button>h1]:!text-sm [&_button>h1]:!text-gray-700">
+                              <ManualOrderPopUp memberId={member.id} clubId={selectedClub.clubId} />
+                            </div>
+                          </div>
+
+                          <div className="h-px bg-gray-100 my-1 mx-2"></div>
+
+                          <DeleteMember 
+                            memberId={member.id} 
+                            onClose={() => setOpenActionMenu(null)} 
+                            onSuccess={() => getClubMembers(selectedClub.clubId).then(setMembers)}
+                          />
+                        </div>
+                      )}
                     </td>
                   </tr>
+
                 ))}
               </tbody>
             </table>

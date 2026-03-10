@@ -2,6 +2,7 @@
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { getSession } from "@/lib/auth";
+import { updateMemberSchema } from "@/lib/validations/members";
 
 export async function getClubMembers(clubId: string) {
     const session = await getSession();
@@ -106,17 +107,95 @@ export async function getMemberFormItemsFromToken(token: string) {
     if (!member) {
         throw new Error("Member not found");
     }
-   const form = await prisma.form.findFirst({
-    where: {
-        clubId: member.clubId,
-        targetGroups: { has: member.group },
-    },
-    include: {
-        items: {
-            include: { product: true },
+    const form = await prisma.form.findFirst({
+        where: {
+            clubId: member.clubId,
+            targetGroups: { has: member.group },
         },
-    },
-});
+        include: {
+            items: {
+                include: { product: true },
+            },
+        },
+    });
 
     return form;
+}
+
+export async function updateMember(memberId: string, data: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    group: string;
+}) {
+    const session = await getSession();
+    if (!session) {
+        throw new Error("No session found");
+    }
+    const member = await prisma.member.findUnique({
+        where: {
+            id: memberId,
+        },
+    });
+    if (!member) {
+        throw new Error("Member not found");
+    }
+    const clubUser = await prisma.clubUser.findUnique({
+        where: {
+            userId_clubId: {
+                userId: session.id,
+                clubId: member.clubId,
+            },
+        },
+    });
+    if (!clubUser) {
+        throw new Error("Not authorized");
+    }
+    const validatedData = updateMemberSchema.parse(data);
+
+    await prisma.member.update({
+        where: {
+            id: memberId,
+        },
+        data: {
+            firstName: validatedData.firstName,
+            lastName: validatedData.lastName,
+            email: validatedData.email,
+            group: validatedData.group,
+        },
+    });
+    revalidatePath(`/dashboard/members`);
+}
+
+export async function deleteMember(memberId: string) {
+    const session = await getSession();
+    if (!session) {
+        throw new Error("No session found");
+    }
+    const member = await prisma.member.findUnique({
+        where: {
+            id: memberId,
+        },
+    });
+    if (!member) {
+        throw new Error("Member not found");
+    }
+    const clubUser = await prisma.clubUser.findUnique({
+        where: {
+            userId_clubId: {
+                userId: session.id,
+                clubId: member.clubId,
+            },
+        },
+    });
+    if (!clubUser) {
+        throw new Error("Not authorized");
+    }
+
+    await prisma.member.delete({
+        where: {
+            id: memberId,
+        },
+    });
+    revalidatePath(`/dashboard/members`);
 }

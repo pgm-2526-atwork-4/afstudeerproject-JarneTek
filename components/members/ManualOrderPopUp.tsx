@@ -38,7 +38,7 @@ export default function ManualOrderPopUp({
     setLoading(true);
     const orderItems = selectedItems.map((item) => ({
       productId: item.id,
-      size: size[item.id] || "",
+      size: size[item.id] || item.sizes[0] || "", // Default to first available size if not explicitly selected
       quantity: quantity[item.id] || 1,
       price: item.defaultPrice,
     }));
@@ -105,7 +105,7 @@ export default function ManualOrderPopUp({
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <select
-                        value={size[item.id] || ""}
+                        value={size[item.id] || item.sizes[0] || ""} // Default to first available size if not explicitly selected
                         onChange={(e) =>
                           setSize({ ...size, [item.id]: e.target.value })
                         }
