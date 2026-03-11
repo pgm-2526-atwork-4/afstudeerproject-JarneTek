@@ -2,7 +2,7 @@
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 
-export async function getClubOrders(clubId: string) {
+export async function getClubOrders(clubId: string, fittingDayId?: string) {
     const session = await getSession();
     if (!session) {
         throw new Error("No session found");
@@ -23,6 +23,7 @@ export async function getClubOrders(clubId: string) {
             member: {
                 clubId,
             },
+            fittingDayId,
         },
         include: {
             member: true,
@@ -37,7 +38,6 @@ export async function getClubOrders(clubId: string) {
         }
     });
 
-    // Convert Prisma Decimal to primitive Number for Next.js Client Components
     return orders.map((order) => ({
         ...order,
         totalPrice: Number(order.totalPrice),
@@ -48,7 +48,7 @@ export async function getClubOrders(clubId: string) {
     }));
 }
 
-export async function createManualOrder(memberId: string, items: { productId: string; size: string; quantity: number; price: number }[], clubId: string, totalPrice: number){
+export async function createManualOrder(memberId: string, items: { productId: string; size: string; quantity: number; price: number }[], clubId: string, totalPrice: number) {
     const session = await getSession();
     if (!session) {
         throw new Error("No session found");
@@ -98,6 +98,7 @@ export async function createMemberOrder(token: string, totalPrice: number, items
         data: {
             memberId: member.id,
             totalPrice: totalPrice,
+            fittingDayId: member.fittingDayId,
             items: {
                 create: items.map((item) => ({
                     productId: item.productId,
@@ -112,4 +113,31 @@ export async function createMemberOrder(token: string, totalPrice: number, items
         ...order,
         totalPrice: Number(order.totalPrice),
     };
+}
+
+export async function getClubFittingDays(clubId: string) {
+    const session = await getSession();
+    if (!session) {
+        throw new Error("No session found");
+    }
+    const clubUser = await prisma.clubUser.findUnique({
+        where: {
+            userId_clubId: {
+                userId: session.id,
+                clubId,
+            },
+        },
+    });
+    if (!clubUser) {
+        throw new Error("Not authorized");
+    }
+    const fittingDays = await prisma.fittingDay.findMany({
+        where: {
+            clubId,
+        },
+        orderBy: {
+            date: 'desc'
+        }
+    });
+    return fittingDays;
 }

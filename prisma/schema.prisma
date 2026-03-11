@@ -95,17 +95,20 @@ model FormItem {
 }
 
 model Member {
-  id          String   @id @default(uuid())
-  firstName   String
-  lastName    String
-  email       String
-  group       String
-  orderToken  String?  @unique
-  hasPaid     Boolean  @default(false)
+  id            String      @id @default(uuid())
+  firstName     String
+  lastName      String
+  email         String
+  group         String
+  orderToken    String?     @unique
+  hasPaid       Boolean     @default(false)
   
-  clubId      String
-  club        Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
-  orders      Order[]
+  clubId        String
+  club          Club        @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  orders        Order[]
+
+  fittingDayId  String?
+  fittingDay    FittingDay?  @relation(fields: [fittingDayId], references: [id])
 }
 
 model FittingDay {
@@ -114,10 +117,13 @@ model FittingDay {
   startTime String
   endTime   String
   location  String?
+  reminderSent Boolean @default(false)
+  targetGroups String[]
   
   clubId    String
   club      Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
   orders    Order[]
+  members   Member[]
 }
 
 model Order {

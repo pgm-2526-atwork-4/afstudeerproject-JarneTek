@@ -48,27 +48,52 @@ export async function sendOrderLinkEmail(orderLink: string, clubName: string, st
   return { data };
 }
 
-export async function sendTestEmail() {
+export async function sendReminderEmail(
+  memberEmail: string,
+  memberName: string,
+  clubName: string,
+  date: string,
+  startTime: string,
+  endTime: string,
+  location: string | null,
+  orderToken: string | null
+) {
+  const orderLink = orderToken
+    ? `${process.env.NEXT_PUBLIC_APP_URL}/order/${orderToken}`
+    : null;
+
   const { data, error } = await resend.emails.send({
     from: "onboarding@resend.dev",
-    to: "jarne.tekin@hotmail.com",
-    subject: "Your Personal Order Link is Ready!",
+    to: "jarne.tekin@hotmail.com", // TODO: vervang door memberEmail na domein verificatie in Resend
+    subject: `Reminder: je pasdag bij ${clubName} is morgen!`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px;">
-        <h2 style="color: #1a202c; text-align: center;">Your Club Kit Order Link</h2>
+        <h2 style="color: #1a202c; text-align: center;">Reminder: pasdag morgen bij ${clubName}!</h2>
         <p style="color: #4a5568; font-size: 16px; line-height: 1.5;">
-          Dear club member,<br><br>
-          Your personal order page is ready! You can securely log in and order or pay for your clothing kit via the button below.
+          Hallo ${memberName},<br><br>
+          Een korte herinnering: morgen is de pasdag van <strong>${clubName}</strong>.
+        </p>
+        
+        <div style="background-color: #f8fafc; border-radius: 8px; padding: 16px; margin: 20px 0; text-align: center;">
+          <h3 style="color: #0f172a; margin-top: 0; margin-bottom: 12px;">Details pasdag</h3>
+          <p style="margin: 4px 0; color: #4a5568;"><strong>Datum:</strong> ${date}</p>
+          <p style="margin: 4px 0; color: #4a5568;"><strong>Tijdstip:</strong> ${startTime} - ${endTime}</p>
+          ${location ? `<p style="margin: 4px 0; color: #4a5568;"><strong>Locatie:</strong> ${location}</p>` : ""}
+        </div>
+
+        ${orderLink ? `
+        <p style="color: #4a5568; font-size: 16px; line-height: 1.5; text-align: center;">
+          Heb je jouw kledij nog niet geselecteerd? Doe dit via de knop hieronder.
         </p>
         <div style="text-align: center; margin: 30px 0;">
-          <a href="#" style="background-color: #0f172a; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block;">
-            View My Order
+          <a href="${orderLink}" style="background-color: #0f172a; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block;">
+            Selecteer mijn kledij
           </a>
         </div>
         <p style="color: #a0aec0; font-size: 12px; text-align: center; margin-top: 30px;">
-          This link is personal and specific to your profile. Do not share it with others.<br>
-          If the button doesn't work, copy the link (to be populated later) into your browser.
+          Deze link is persoonlijk en specifiek voor jouw profiel. Deel deze niet met anderen.
         </p>
+        ` : ""}
       </div>
     `,
   });

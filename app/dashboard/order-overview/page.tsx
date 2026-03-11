@@ -1,9 +1,9 @@
 "use client";
 
 import { useClub } from "@/providers/clubprovider";
-import { getClubOrders } from "@/lib/actions/orders";
+import { getClubOrders, getClubFittingDays } from "@/lib/actions/orders";
 import { useState, useEffect } from "react";
-import { Order, OrderItem, Member, Product } from "@prisma/client";
+import { Order, OrderItem, Member, Product, FittingDay } from "@prisma/client";
 
 type OrderWithDetails = Omit<Order, "totalPrice"> & {
   totalPrice: number;
@@ -17,14 +17,29 @@ export default function OrdersPage() {
   const [activeTab, setActiveTab] = useState<"summary" | "individual">(
     "summary",
   );
+  const [activeFittingDay, setActiveFittingDay] = useState<string | null>(null);
+  const [fittingDays, setFittingDays] = useState<FittingDay[]>([]);
 
   useEffect(() => {
     if (selectedClub) {
+      getClubFittingDays(selectedClub.clubId).then((data) =>
+        setFittingDays(data as FittingDay[]),
+      );
+    }
+  }, [selectedClub]);
+
+  useEffect(() => {
+
+    if (selectedClub && activeFittingDay) {
+      getClubOrders(selectedClub.clubId, activeFittingDay).then((data) =>
+        setOrders(data as OrderWithDetails[]),
+      );
+    } else if (selectedClub) {
       getClubOrders(selectedClub.clubId).then((data) =>
         setOrders(data as OrderWithDetails[]),
       );
     }
-  }, [selectedClub]);
+  }, [selectedClub, activeFittingDay]);
 
   if (!selectedClub) {
     return (
@@ -62,34 +77,52 @@ export default function OrdersPage() {
   return (
     <div className="flex-1 overflow-auto p-6">
       <div className="max-w-5xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-brand-navy">Order Overview</h1>
-          <p className="text-gray-500 text-sm">{orders.length} orders</p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-brand-navy">Order Overview</h1>
+            <p className="text-gray-500 text-sm">{orders.length} orders</p>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-400">Filter by Fitting Day:</span>
+            <select
+              value={activeFittingDay || ""}
+              onChange={(e) => setActiveFittingDay(e.target.value || null)}
+              className="bg-white border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-brand-navy focus:border-brand-navy block p-2.5 outline-none"
+            >
+              <option value="">All Fitting Days</option>
+              {fittingDays.map((day) => (
+                <option key={day.id} value={day.id}>
+                  {new Date(day.date).toLocaleDateString('nl-BE')} - {day.location}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        <div className="flex gap-2">
-          <button
-            onClick={() => setActiveTab("summary")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === "summary"
-                ? "bg-brand-navy text-white"
-                : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-            }`}
-          >
-            Artikel Samenvatting
-          </button>
-          <button
-            onClick={() => setActiveTab("individual")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === "individual"
-                ? "bg-brand-navy text-white"
-                : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-            }`}
-          >
-            Individuele Bestellingen
-          </button>
-        </div>
-
+          <div className="flex gap-2">
+            <button
+              onClick={() => setActiveTab("summary")}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === "summary"
+                  ? "bg-brand-navy text-white"
+                  : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              Artikel Samenvatting
+            </button>
+            <button
+              onClick={() => setActiveTab("individual")}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === "individual"
+                  ? "bg-brand-navy text-white"
+                  : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              Individuele Bestellingen
+            </button>
+          </div>
+          
         {activeTab === "summary" && (
           <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
             {summaryItems.length === 0 ? (

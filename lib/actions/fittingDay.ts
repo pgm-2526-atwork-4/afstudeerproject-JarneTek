@@ -1,7 +1,7 @@
 "use server";
 
 import crypto from "crypto";
-import {prisma} from "@/lib/db";
+import { prisma } from "@/lib/db";
 import { sendOrderLinkEmail } from "./email";
 
 export async function startFittingDay(clubId: string, formId: string, formData: FormData) {
@@ -34,16 +34,17 @@ export async function startFittingDay(clubId: string, formId: string, formData: 
             date: new Date(formData.get("date") as string),
             startTime: formData.get("startTime") as string,
             endTime: formData.get("endTime") as string,
-            location: formData.get("location") as string
+            location: formData.get("location") as string,
+            targetGroups: form.targetGroups,
         },
     });
 
-        for (const member of members) {
+    for (const member of members) {
         const token = crypto.randomUUID();
 
         await prisma.member.update({
             where: { id: member.id },
-            data: { orderToken: token },
+            data: { orderToken: token, fittingDayId: fittingDay.id },
         });
 
         const orderLink = `${process.env.NEXT_PUBLIC_APP_URL}/order/${token}`;
@@ -53,9 +54,9 @@ export async function startFittingDay(clubId: string, formId: string, formData: 
             month: 'long',
             year: 'numeric'
         });
-        
+
         await sendOrderLinkEmail(orderLink, club.name, fittingDay.startTime, fittingDay.endTime, formattedDate);
     }
-    return fittingDay;      
+    return fittingDay;
 
 }
