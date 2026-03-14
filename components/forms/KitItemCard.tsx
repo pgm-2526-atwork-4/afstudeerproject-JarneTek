@@ -13,7 +13,7 @@ type CartItem = {
   quantity: number;
 };
 
-export default function KitItemCard({ item, onAdd }: { item: KitItem, onAdd: (item: CartItem) => void }) {
+export default function   KitItemCard({ item, onAdd }: { item: KitItem, onAdd: (item: CartItem) => void }) {
   const [selectedSize, setSelectedSize] = useState(item.product.sizes[0] || "");
   const [selectedQuantity, setSelectedQuantity] = useState(1);
 

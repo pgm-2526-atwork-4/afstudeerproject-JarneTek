@@ -110,10 +110,10 @@ export default function MembersPage() {
             No members found.
           </div>
         ) : (
-          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <div className="bg-white border border-gray-200 rounded-xl">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-gray-50 border-b border-gray-200 text-left text-brand-navy">
+                <tr className="bg-gray-50 border-b border-gray-200 text-left text-brand-navy [&>th:first-child]:rounded-tl-xl [&>th:last-child]:rounded-tr-xl">
                   <th className="px-4 py-3 font-semibold">Member Name</th>
                   <th className="px-4 py-3 font-semibold">Email</th>
                   <th className="px-4 py-3 font-semibold">U-Group</th>
@@ -172,7 +172,7 @@ export default function MembersPage() {
                       </button>
 
                       {openActionMenu === member.id && (
-                        <div className="absolute top-full right-4 mt-2 z-20 w-44 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] border border-gray-100 py-1.5 overflow-hidden origin-top-right text-left">
+                        <div className="absolute top-full right-0 mt-1 z-20 w-44 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] border border-gray-100 py-1.5 origin-top-right text-left">
                           <EditMember
                             member={member}
                             onSuccess={() => getClubMembers(selectedClub.clubId).then(setMembers)}
