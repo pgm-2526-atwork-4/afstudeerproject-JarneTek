@@ -4,6 +4,7 @@ import {prisma} from "../db";
 import {getSession} from "../auth";
 import {createFormSchema, addArticleToFormSchema} from "../validations/forms";
 import {revalidatePath} from "next/cache";
+import { defaultProductsData } from "../data/defaultProducts";
 
 export async function getFormsByClubId(clubId: string) {
     const session = await getSession();
@@ -84,8 +85,40 @@ export async function createForm(formData: FormData, clubId: string) {
             clubId,
         },
     });
-    revalidatePath(`/dashboard/form-builder`);
-    return form;
+const createdProducts = [];
+
+    for (const prodData of defaultProductsData){
+        const newProducts = await prisma.product.create({
+            data:{
+                name: prodData.name,
+                description: prodData.description,
+                imageUrl: prodData.imageUrl,
+                defaultPrice: prodData.defaultPrice,
+                sku: prodData.sku,
+                sizes: prodData.sizes,
+                clubId: clubId
+                
+            }
+        })
+        createdProducts.push(newProducts)
+    }
+    const formItems = createdProducts.map((product)=>{
+        return {
+            type: "BASIC" as const,
+            includedInBasicCount: 1,
+            customPrice: product.defaultPrice,
+            isRequired: true,
+            formId: form.id,
+            productId: product.id,
+        }
+    })
+
+    await prisma.formItem.createMany({
+        data: formItems
+    })
+    
+        revalidatePath(`/dashboard/form-builder`);
+    return form
 }
 
 export async function updateForm(formId: string, formData: FormData) {

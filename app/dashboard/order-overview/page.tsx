@@ -4,6 +4,7 @@ import { useClub } from "@/providers/clubprovider";
 import { getClubOrders, getClubFittingDays } from "@/lib/actions/orders";
 import { useState, useEffect } from "react";
 import { Order, OrderItem, Member, Product, FittingDay } from "@prisma/client";
+import { printOrderPDF } from "@/lib/helpers/print";
 
 type OrderWithDetails = Omit<Order, "totalPrice"> & {
   totalPrice: number;
@@ -49,6 +50,14 @@ export default function OrdersPage() {
     );
   }
 
+  function printPDF() {
+    const selectedDay = fittingDays.find((d) => d.id === activeFittingDay);
+    const title = selectedDay
+      ? `Bestellingen \u2013 ${new Date(selectedDay.date).toLocaleDateString("nl-BE")}${selectedDay.location ? " \u2013 " + selectedDay.location : ""}`
+      : "Bestellingen \u2013 Alle pasdagen";
+    printOrderPDF({ title, summaryItems });
+  }
+
   const summaryItems: {
     productName: string;
     size: string;
@@ -83,7 +92,7 @@ export default function OrdersPage() {
             <p className="text-gray-500 text-sm">{orders.length} orders</p>
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-sm text-gray-400">Filter by Fitting Day:</span>
             <select
               value={activeFittingDay || ""}
@@ -97,6 +106,14 @@ export default function OrdersPage() {
                 </option>
               ))}
             </select>
+            <button
+              onClick={printPDF}
+              disabled={orders.length === 0}
+              className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-200 text-brand-navy text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              Print / PDF
+            </button>
           </div>
         </div>
 

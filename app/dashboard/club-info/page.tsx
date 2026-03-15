@@ -104,6 +104,18 @@ export default function ClubInfoPage() {
                 disabled
               />
             </div>
+
+          </div>
+          <div>
+            <label className="text-sm font-medium text-brand-navy">
+              IBAN
+            </label>
+            <input
+              type="text"
+              name="iban"
+              defaultValue={club.iban || ""}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-brand-green"
+            />
           </div>
 
           <button

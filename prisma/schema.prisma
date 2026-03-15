@@ -15,6 +15,7 @@ model Club {
   logoUrl        String?
   primaryColor   String   @default("#000000")
   secondaryColor String?
+  iban           String?
   
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -153,7 +154,7 @@ model OrderItem {
   order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   
   productId String
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 enum ClubUserRole {

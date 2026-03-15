@@ -28,11 +28,10 @@ export default async function OrderPage({
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="max-w-md w-full bg-white rounded-xl shadow p-8 text-center">
           <h1 className="text-2xl font-bold text-gray-800 mb-4">
-            Bestelling al geplaatst
+            You have already placed an order
           </h1>
           <p className="text-gray-600">
-            Je hebt al een bestelling geplaatst. Neem contact op met je club als
-            je wijzigingen wilt maken.
+            It looks like you have already placed an order for this fitting day.
           </p>
         </div>
       </div>
@@ -46,10 +45,10 @@ export default async function OrderPage({
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="max-w-md w-full bg-white rounded-xl shadow p-8 text-center">
           <h1 className="text-2xl font-bold text-gray-800 mb-4">
-            Geen formulier gevonden
+            No Order Form Available
           </h1>
           <p className="text-gray-600">
-            Er is momenteel geen bestelformulier beschikbaar voor jouw groep.
+            There is currently no order form available for your group.
           </p>
         </div>
       </div>
@@ -73,8 +72,8 @@ export default async function OrderPage({
             {member.club.name}
           </h1>
           <p className="text-gray-600 mt-2">
-            Welkom {member.firstName} {member.lastName}! Plaats hieronder je
-            bestelling.
+            Welcome {member.firstName} {member.lastName}! Please place your
+            order below.
           </p>
         </div>
 

@@ -18,8 +18,6 @@ type CartItem = {
   quantity: number;
 };
 
-// token = member zelf bestelt via link
-// memberId + clubId = admin maakt manual order
 type MemberFormItemsProps = {
   form: Exclude<FormWithItems, null>;
   token?: string;

@@ -30,6 +30,7 @@ export async function createClub(formData: FormData): Promise<{ error: string } 
         name: formData.get("name"),
         primaryColor: formData.get("primaryColor"),
         secondaryColor: formData.get("secondaryColor") || undefined,
+        iban: formData.get("iban") || undefined,
     });
     if (!parsed.success) {
         return { error: parsed.error.issues[0].message };
@@ -75,6 +76,7 @@ export async function updateClub(clubId: string, formData: FormData) {
         name: formData.get("name"),
         primaryColor: formData.get("primaryColor"),
         secondaryColor: formData.get("secondaryColor") || undefined,
+        iban: formData.get("iban") || undefined,
     });
     if (!parsed.success) {
         return { error: parsed.error.issues[0].message };
@@ -89,6 +91,7 @@ export async function updateClub(clubId: string, formData: FormData) {
             slug,
             primaryColor: parsed.data.primaryColor,
             secondaryColor: parsed.data.secondaryColor,
+            iban: parsed.data.iban,
         },
     });
 

@@ -4,6 +4,7 @@ export const createClubSchema = z.object({
     name: z.string().min(1, "Club name is required").max(100, "Club name is too long"),
     primaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Invalid color format"),
     secondaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Invalid color format").optional(),
+    iban: z.string().optional(), 
 });
 
 export type CreateClubSchema = z.infer<typeof createClubSchema>;
@@ -19,5 +20,6 @@ export type ClubEntry = {
         slug: string;
         primaryColor: string;
         secondaryColor: string | null;
+        iban: string | null;
     };
 };
