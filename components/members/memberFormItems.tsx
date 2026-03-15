@@ -69,8 +69,8 @@ export default function MemberFormItems({ form, token, memberId, clubId, onSucce
     }));
 
     if (token) {
-      await createMemberOrder(token, totalPrice, items);
-      router.refresh();
+      const newOrder = await createMemberOrder(token, totalPrice, items);
+      router.push(`/checkout/success?orderId=${newOrder.id}&token=${token}`);
     } else {
       await createManualOrder(memberId!, items, clubId!, totalPrice);
       setCartItems([]);

@@ -1,11 +1,14 @@
+import { Prisma } from "@prisma/client";
+import { Decimal } from "@prisma/client/runtime/library";
+
 type FormWithItems = {
     items: {
         id: string;
         type: "BASIC" | "EXTRA";
         includedInBasicCount: number;
-        customPrice: number | null | any;
+        customPrice: Prisma.Decimal | number | string | null;
         product: {
-            defaultPrice: number | any;
+            defaultPrice: Prisma.Decimal | number | string;
         };
     }[];
 };
@@ -39,4 +42,25 @@ export function calculateCartTotal(cart: CartItem[], form: FormWithItems): numbe
     });
 
     return total;
+}
+
+export function createQrCode(clubName: string, iban: string, amount: Decimal, reference: string) {
+    const ibanNoSpace = iban.replace(/\s/g, "");
+    const formattedAmount = amount.toFixed(2);
+       
+    const epcData = [
+    "BCD",                     
+    "002",                    
+    "1",                       
+    "SCT",                    
+    "",                        
+    clubName,                 
+    ibanNoSpace,               
+    `EUR${formattedAmount}`,   
+    "",                        
+    reference                  
+  ];
+
+  return epcData.join("\n");
+    
 }
