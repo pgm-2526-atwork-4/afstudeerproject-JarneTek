@@ -50,6 +50,20 @@ export default async function CheckoutSuccessPage({searchParams}: {searchParams:
 
   const qrCode = iban ? createQrCode(clubName, iban, totalAmount, reference) : null;
 
+  if (formattedTotal === "0.00") {
+    return (
+      <div className="flex-1 flex items-center justify-center p-6">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-green-500">Order Successful</h1>
+          <p className="text-gray-500 mt-2">
+            Your order has been placed successfully. No payment is required for this order.
+          </p>
+        </div>
+      </div>
+    );
+  }
+  
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <div className="w-full max-w-xl rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">

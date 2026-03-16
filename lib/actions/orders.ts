@@ -1,6 +1,7 @@
 "use server";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
+import { revalidatePath } from "next/cache";
 
 export async function getClubOrders(clubId: string, fittingDayId?: string) {
     const session = await getSession();
@@ -94,6 +95,29 @@ export async function createMemberOrder(token: string, totalPrice: number, items
     if (!member) {
         throw new Error("No member found");
     }
+
+    if (totalPrice === 0) {
+        const order = await prisma.order.create({
+        data: {
+            memberId: member.id,
+            totalPrice: totalPrice,
+            fittingDayId: member.fittingDayId,
+            status: 'CONFIRMED',
+            items: {
+                create: items.map((item) => ({
+                    productId: item.productId,
+                    size: item.size,
+                    quantity: item.quantity,
+                    price: item.price,
+                })),
+            },
+        },    })
+        return {
+            ...order,
+            totalPrice: Number(order.totalPrice),
+        };
+        
+    } else {
     const order = await prisma.order.create({
         data: {
             memberId: member.id,
@@ -113,6 +137,7 @@ export async function createMemberOrder(token: string, totalPrice: number, items
         ...order,
         totalPrice: Number(order.totalPrice),
     };
+}
 }
 
 export async function getClubFittingDays(clubId: string) {
@@ -140,4 +165,24 @@ export async function getClubFittingDays(clubId: string) {
         }
     });
     return fittingDays;
+}
+
+export async function confirmOrder(orderId: string){
+try {
+    await prisma.order.updateMany({
+      where: {
+        id: orderId,
+        status: "PENDING", 
+      },
+      data: {
+        status: "CONFIRMED",
+      },
+    });
+
+    revalidatePath("/dashboard/order-overview");
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { success: false };
+  }
 }

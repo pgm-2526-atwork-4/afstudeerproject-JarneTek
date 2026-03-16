@@ -1,10 +1,11 @@
 "use client";
 
 import { useClub } from "@/providers/clubprovider";
-import { getClubOrders, getClubFittingDays } from "@/lib/actions/orders";
+import { getClubOrders, getClubFittingDays, confirmOrder } from "@/lib/actions/orders";
 import { useState, useEffect } from "react";
 import { Order, OrderItem, Member, Product, FittingDay } from "@prisma/client";
 import { printOrderPDF } from "@/lib/helpers/print";
+
 
 type OrderWithDetails = Omit<Order, "totalPrice"> & {
   totalPrice: number;
@@ -15,11 +16,35 @@ type OrderWithDetails = Omit<Order, "totalPrice"> & {
 export default function OrdersPage() {
   const { selectedClub } = useClub();
   const [orders, setOrders] = useState<OrderWithDetails[]>([]);
-  const [activeTab, setActiveTab] = useState<"summary" | "individual">(
+  const [activeTab, setActiveTab] = useState<"summary" | "individual" | "pending">(
     "summary",
   );
+
   const [activeFittingDay, setActiveFittingDay] = useState<string | null>(null);
   const [fittingDays, setFittingDays] = useState<FittingDay[]>([]);
+  const [confirmingOrderId, setConfirmingOrderId] = useState<string | null>(null);
+  const [confirmMessage, setConfirmMessage] = useState<string | null>(null);
+  const [confirmError, setConfirmError] = useState<string | null>(null);
+
+  const handleConfirmOrder = async (orderId: string) => {
+    setConfirmError(null);
+    setConfirmMessage(null);
+    setConfirmingOrderId(orderId);
+
+    const res = await confirmOrder(orderId);
+    if (res.success) {
+      setOrders((prev) =>
+        prev.map((o) =>
+          o.id === orderId ? { ...o, status: "CONFIRMED" } : o,
+        )
+      );
+      setConfirmMessage("The order was marked as CONFIRMED and removed from Pending Orders.");
+    } else {
+      setConfirmError("Could not confirm this order. Please try again.");
+    }
+
+    setConfirmingOrderId(null);
+  };
 
   useEffect(() => {
     if (selectedClub) {
@@ -83,6 +108,8 @@ export default function OrdersPage() {
     });
   });
 
+  const pendingOrders = orders.filter((o) => o.status === "PENDING");
+
   return (
     <div className="flex-1 overflow-auto p-6">
       <div className="max-w-5xl mx-auto space-y-6">
@@ -126,7 +153,7 @@ export default function OrdersPage() {
                   : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
               }`}
             >
-              Artikel Samenvatting
+              Summary View
             </button>
             <button
               onClick={() => setActiveTab("individual")}
@@ -136,7 +163,17 @@ export default function OrdersPage() {
                   : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
               }`}
             >
-              Individuele Bestellingen
+              individual Orders
+            </button>
+            <button
+              onClick={() => setActiveTab("pending")}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === "pending"
+                  ? "bg-brand-navy text-white"
+                  : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              Pending ({pendingOrders.length})
             </button>
           </div>
           
@@ -237,6 +274,78 @@ export default function OrdersPage() {
                   </table>
                   <div className="text-right text-sm font-semibold text-brand-navy">
                     Total: {Number(order.totalPrice).toFixed(2)} EUR
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+        {activeTab === "pending" && (
+          <div className="space-y-4">
+            <p className="text-sm text-gray-500">
+              Click <span className="font-medium text-brand-navy">Set to confirmed</span> to change an order from pending to confirmed.
+            </p>
+
+            {confirmMessage && (
+              <div className="text-sm text-green-700">
+                {confirmMessage}
+              </div>
+            )}
+
+            {confirmError && (
+              <div className="text-sm text-red-600">
+                {confirmError}
+              </div>
+            )}
+
+            {pendingOrders.length === 0 ? (
+              <div className="bg-white border border-dashed border-gray-200 rounded-xl p-10 text-center text-gray-400 text-sm">
+                No pending orders left to confirm.
+              </div>
+            ) : (
+              pendingOrders.map((order) => (
+                <div
+                  key={order.id}
+                  className="rounded-xl border border-gray-200 bg-white p-4"
+                >
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <p className="font-medium text-brand-navy">
+                        {order.member.firstName} {order.member.lastName}
+                      </p>
+                      <p className="mt-1 text-sm text-gray-500">
+                        Order #{order.orderNumber}
+                      </p>
+                      <p className="mt-1 text-sm text-gray-500">
+                        Total: €{Number(order.totalPrice).toFixed(2)}
+                      </p>
+                    </div>
+
+                    <div className="sm:text-right">
+                      <button
+                        type="button"
+                        onClick={() => handleConfirmOrder(order.id)}
+                        disabled={confirmingOrderId === order.id}
+                        className="mt-3 inline-flex items-center justify-center rounded-lg border border-brand-navy bg-brand-navy px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-navy-light hover:border-brand-navy-light disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {confirmingOrderId === order.id ? "Confirming..." : "Set to confirmed"}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 border-t border-gray-100 pt-4">
+                    <ul className="space-y-1 text-sm text-gray-600">
+                      {order.items.map((item) => (
+                        <li key={item.id} className="flex items-center justify-between gap-4 text-gray-600">
+                          <span>
+                            {item.quantity}x {item.product.name} ({item.size})
+                          </span>
+                          <span>
+                            €{(Number(item.price) * item.quantity).toFixed(2)}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
               ))
