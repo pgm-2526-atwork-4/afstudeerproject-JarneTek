@@ -3,20 +3,32 @@
 import crypto from "crypto";
 import { prisma } from "@/lib/db";
 import { sendOrderLinkEmail } from "./email";
+import { startFittingDaySchema } from "../validations/fittingDay";
 
 export async function startFittingDay(clubId: string, formId: string, formData: FormData) {
+
+    const validated = startFittingDaySchema.safeParse({
+        date: formData.get("date"), 
+        startTime: formData.get("startTime"), 
+        endTime: formData.get("endTime"), 
+        location: formData.get("location")
+    });
+    if (!validated.success) {
+        return { error: validated.error.flatten().fieldErrors };
+    }
+
     const club = await prisma.club.findUnique({
         where: { id: clubId },
     });
     if (!club) {
-        throw new Error("Club not found");
+        return { error: "Club not found" };
     }
 
     const form = await prisma.form.findUnique({
         where: { id: formId },
     });
     if (!form) {
-        throw new Error("Form not found");
+        return { error: "Form not found" };
     }
 
     const members = await prisma.member.findMany({
@@ -28,13 +40,17 @@ export async function startFittingDay(clubId: string, formId: string, formData: 
         },
     });
 
+    if (members.length === 0) {
+        return { error: "No members found for the selected form" };
+    }
+
     const fittingDay = await prisma.fittingDay.create({
         data: {
             clubId,
-            date: new Date(formData.get("date") as string),
-            startTime: formData.get("startTime") as string,
-            endTime: formData.get("endTime") as string,
-            location: formData.get("location") as string,
+            date: new Date(validated.data.date),
+            startTime: validated.data.startTime,
+            endTime: validated.data.endTime,
+            location: validated.data.location,
             targetGroups: form.targetGroups,
         },
     });
@@ -57,6 +73,6 @@ export async function startFittingDay(clubId: string, formId: string, formData: 
 
         await sendOrderLinkEmail(orderLink, club.name, fittingDay.startTime, fittingDay.endTime, formattedDate);
     }
-    return fittingDay;
+    return { success: "Fitting day started successfully", fittingDay };
 
 }

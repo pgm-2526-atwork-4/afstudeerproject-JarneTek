@@ -79,7 +79,9 @@ export async function importMembers(membersData: Record<string, string>[], clubI
     if (!clubUser) {
         throw new Error("Not authorized");
     }
-    const members = membersData.map((member) => {
+    const members = membersData
+        .filter((member) => member.firstName?.trim() && member.lastName?.trim() && member.email?.trim() && member.group?.trim())
+        .map((member) => {
         return {
             firstName: member.firstName,
             lastName: member.lastName,

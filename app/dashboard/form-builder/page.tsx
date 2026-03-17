@@ -6,12 +6,16 @@ import { useClub } from "@/providers/clubprovider";
 import { getFormsByClubId, createForm } from "@/lib/actions/forms";
 import { getClubMembers } from "@/lib/actions/members";
 import FormCard from "@/components/forms/FormCard";
+import NoMembersState from "@/components/dashboard/NoMembersState";
 
 export default function FormBuilderPage() {
   const { selectedClub } = useClub();
   const [forms, setForms] = useState<Form[]>([]);
   const formRef = useRef<HTMLFormElement>(null);
   const [members, setMembers] = useState<Member[]>([]);
+  const [membersLoaded, setMembersLoaded] = useState(false);
+
+
 
   useEffect(() => {
     if (!selectedClub) return;
@@ -20,11 +24,17 @@ export default function FormBuilderPage() {
     });
   }, [selectedClub]);
 
+  const fetchMembers = (clubId: string) => {
+    setMembersLoaded(false);
+    getClubMembers(clubId).then((data) => {
+      if (data) setMembers(data);
+      setMembersLoaded(true);
+    });
+  };
+
   useEffect(() => {
     if (!selectedClub) return;
-    getClubMembers(selectedClub.club.id).then((data) => {
-      if (data) setMembers(data);
-    });
+    fetchMembers(selectedClub.club.id);
   }, [selectedClub]);
 
   const uniqueGroups = [...new Set(members.map((member) => member.group))].sort(
@@ -49,10 +59,28 @@ export default function FormBuilderPage() {
   if (!selectedClub) {
     return (
       <div className="flex-1 flex items-center justify-center text-gray-400">
-        Select a club to continue.
+        Please select a club...
       </div>
     );
   }
+
+  if (!membersLoaded) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-brand-green border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (membersLoaded && members.length === 0) {
+    return (
+      <NoMembersState
+        clubName={selectedClub?.club?.name}
+        onMembersImported={() => fetchMembers(selectedClub!.club.id)}
+      />
+    );
+  }
+
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">

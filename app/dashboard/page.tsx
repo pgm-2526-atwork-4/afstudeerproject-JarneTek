@@ -132,7 +132,6 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Recent Orders */}
           {stats.recentOrders.length > 0 && (
             <div className="bg-white border border-gray-200 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">

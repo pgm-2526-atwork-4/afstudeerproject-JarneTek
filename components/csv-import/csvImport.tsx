@@ -5,7 +5,7 @@ import Papa from "papaparse";
 import { importMembers } from "@/lib/actions/members";
 import { useClub } from "@/providers/clubprovider";
 
-export default function CsvImport() {
+export default function CsvImport({ onSuccess }: { onSuccess?: () => void }) {
   const [file, setFile] = useState<File | null>(null);
   const [previewData, setPreviewData] = useState<
     Record<string, string>[] | null
@@ -35,6 +35,7 @@ export default function CsvImport() {
         setFile(null);
         setPreviewData(null);
         setData(null);
+        onSuccess?.();
       } catch (error) {
         console.log(error);
       }
