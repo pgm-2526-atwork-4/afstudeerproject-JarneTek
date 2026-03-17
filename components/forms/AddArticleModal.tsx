@@ -27,7 +27,6 @@ export default function AddArticleModal({ formId, onArticleAdded }: Props) {
       return;
     }
 
-    // Upload image server-side if a file was selected
     const imageFile = formData.get("image") as File;
     if (imageFile && imageFile.size > 0) {
       const imageFormData = new FormData();

@@ -6,11 +6,9 @@ import { deleteMember } from "@/lib/actions/members";
 export default function DeleteMember({
   memberId,
   onClose,
-  onSuccess,
 }: {
   memberId: string;
   onClose: () => void;
-  onSuccess: () => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -18,7 +16,6 @@ export default function DeleteMember({
     await deleteMember(memberId);
     setIsOpen(false);
     onClose();
-    onSuccess();
   };
 
   return (

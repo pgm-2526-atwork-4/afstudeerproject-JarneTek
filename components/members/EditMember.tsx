@@ -6,10 +6,8 @@ import { useState } from "react";
 
 export default function EditMember({
   member,
-  onSuccess,
 }: {
   member: Member;
-  onSuccess: () => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -20,7 +18,6 @@ export default function EditMember({
       email: formData.get("email") as string,
       group: formData.get("group") as string,
     });
-    onSuccess();
     setIsOpen(false);
   };
 

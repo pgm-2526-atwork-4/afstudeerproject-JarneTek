@@ -2,10 +2,13 @@
 import { useClub } from "@/providers/clubprovider";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { setActiveClubCookie } from "@/lib/actions/active-club";
 
 export default function ClubSelector() {
   const { clubs, selectedClub, setSelectedClub } = useClub();
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
 
   if (clubs.length === 0) {
     return (
@@ -48,9 +51,11 @@ export default function ClubSelector() {
               {clubs.map((c) => (
                 <button
                   key={c.id}
-                  onClick={() => {
+                  onClick={async () => {
                     setSelectedClub(c);
                     setIsOpen(false);
+                    await setActiveClubCookie(c.clubId);
+                    router.refresh();
                   }}
                   className={`w-full px-3 py-2.5 flex items-center gap-3 text-sm transition-colors ${selectedClub.id === c.id ? "bg-white/10 text-white" : "text-gray-300 hover:bg-white/5 hover:text-white"}`}
                 >
