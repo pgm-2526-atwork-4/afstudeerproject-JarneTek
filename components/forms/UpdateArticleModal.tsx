@@ -27,6 +27,7 @@ export default function AddArticleModal({
   const [articleType, setArticleType] = useState(item.type);
   const [imageUrl, setImageUrl] = useState<string>(item.product.imageUrl || "");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [productName, setProductName] = useState(item.product.name);
 
   const handleUpdateArticle = async (formData: FormData) => {
     setError(null);
@@ -35,7 +36,6 @@ export default function AddArticleModal({
       return;
     }
 
-    // Upload image server-side if a file was selected
     const imageFile = formData.get("image") as File;
     if (imageFile && imageFile.size > 0) {
       const imageFormData = new FormData();
@@ -46,7 +46,6 @@ export default function AddArticleModal({
         setImageUrl(url);
       }
     } else {
-      // Retain existing image URL if no new file is uploaded
       formData.set("imageUrl", imageUrl);
     }
 
@@ -61,6 +60,7 @@ export default function AddArticleModal({
     setSelectedSizes(ADULT_SIZES);
     setArticleType("BASIC");
     setImagePreview(null);
+    setProductName(item.product.name);
     onArticleUpdate();
   };
 
@@ -134,7 +134,8 @@ export default function AddArticleModal({
                 name="name"
                 placeholder="Article name"
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-brand-green"
-                defaultValue={item.product.name}
+                value={productName}
+                onChange={(e) => setProductName(e.target.value)}
               />
               <input
                 type="text"
@@ -176,6 +177,17 @@ export default function AddArticleModal({
                       alt="Preview"
                       className="h-28 object-contain rounded-lg"
                     />
+                  ) : productName ? (
+                    <div className="flex flex-col items-center justify-center text-center">
+                      <div className="w-20 h-20 bg-brand-green/10 text-brand-green rounded-2xl flex items-center justify-center mb-2 shadow-sm p-3">
+                        <span className="text-[11px] font-bold leading-tight uppercase break-words overflow-hidden">
+                          {productName}
+                        </span>
+                      </div>
+                      <span className="text-xs text-gray-400 group-hover:text-brand-navy transition-colors">
+                        Click to replace with photo
+                      </span>
+                    </div>
                   ) : (
                     <>
                       <svg

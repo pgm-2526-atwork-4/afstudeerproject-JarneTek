@@ -224,6 +224,9 @@ export async function createProductForForm(formId: string, formData: FormData) {
     if (!validated.success) {
         return { error: validated.error.issues[0].message };
     }
+    if (!validated.data.imageUrl?.trim() && !validated.data.sku?.trim()) {
+        return { error: "You must provide an image URL or a SKU for the product" };
+    }
 
     const product = await prisma.product.create({
         data: {
@@ -284,6 +287,10 @@ export async function updateFormItem(formItemId: string, formData: FormData) {
     });
     if (!validated.success) {
         return { error: validated.error.issues[0].message };
+    }
+
+    if (!validated.data.imageUrl?.trim() && !validated.data.sku?.trim()) {
+        return { error: "You must provide an image URL or a SKU for the product" };
     }
 
 await prisma.product.update({

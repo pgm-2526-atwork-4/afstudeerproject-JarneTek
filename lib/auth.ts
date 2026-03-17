@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 
 const JWT_SECRET = process.env.JWT_SECRET || "supersecret";
 
-export async function registerUser(email: string, password: string, clubName: string) {
+export async function registerUser(email: string, password: string, clubName: string, iban: string | null) {
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
         throw new Error("User already exists");
@@ -22,6 +22,7 @@ export async function registerUser(email: string, password: string, clubName: st
         data: {
             name: clubName,
             slug: clubName.toLowerCase().replace(/\s+/g, "-"),
+            iban: iban,
         },
     });
 

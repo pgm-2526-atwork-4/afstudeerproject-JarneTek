@@ -7,6 +7,7 @@ import { Form, FormItem, Product } from "@prisma/client";
 import AddArticleModal from "@/components/forms/AddArticleModal";
 import UpdateArticleModal from "@/components/forms/UpdateArticleModal";
 import DeleteFormItem from "@/components/forms/DeleteFormItem";
+import Image from "next/image";
 
 type FormWithItems = Form & { items: (FormItem & { product: Product })[] };
 
@@ -168,9 +169,20 @@ export default function FormDetailPage() {
                       key={item.id}
                       className="border border-gray-200 rounded-xl overflow-hidden"
                     >
-                      <div className="bg-gray-100 h-36 flex items-center justify-center text-gray-300 text-sm">
-                        Image Placeholder
-                      </div>
+                      {item.product.imageUrl ? (
+                        <img
+                          src={item.product.imageUrl}
+                          alt={item.product.name}
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center justify-center text-center">
+                          <div className="w-20 h-20 bg-brand-green/10 text-brand-green rounded-2xl flex items-center justify-center mb-2 shadow-sm p-3">
+                            <span className="text-[11px] font-bold leading-tight uppercase break-words overflow-hidden">
+                              {item.product.name}
+                            </span>
+                          </div>
+                        </div>
+                      )}
                       <div className="p-4 space-y-2">
                         <p className="font-semibold text-brand-navy">
                           {item.product.name}

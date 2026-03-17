@@ -19,6 +19,7 @@ export default function AddArticleModal({ formId, onArticleAdded }: Props) {
   const [articleType, setArticleType] = useState<"BASIC" | "EXTRA">("BASIC");
   const [imageUrl, setImageUrl] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [productName, setProductName] = useState("");
 
   const handleAddArticle = async (formData: FormData) => {
     setError(null);
@@ -51,6 +52,7 @@ export default function AddArticleModal({ formId, onArticleAdded }: Props) {
     setImageUrl("");
     setImagePreview(null);
     onArticleAdded();
+    setProductName("");
   };
 
   return (
@@ -119,6 +121,8 @@ export default function AddArticleModal({ formId, onArticleAdded }: Props) {
               <input
                 type="text"
                 name="name"
+                value={productName}
+                onChange={(e) => setProductName(e.target.value)}
                 placeholder="Article name"
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-brand-green"
               />
@@ -159,6 +163,17 @@ export default function AddArticleModal({ formId, onArticleAdded }: Props) {
                       alt="Preview"
                       className="h-28 object-contain rounded-lg"
                     />
+                  ) : productName ? (
+                    <div className="flex flex-col items-center justify-center text-center">
+                      <div className="w-20 h-20 bg-brand-green/10 text-brand-green rounded-2xl flex items-center justify-center mb-2 shadow-sm p-3">
+                        <span className="text-[11px] font-bold leading-tight uppercase break-words overflow-hidden">
+                          {productName}
+                        </span>
+                      </div>
+                      <span className="text-xs text-gray-400 group-hover:text-brand-navy transition-colors">
+                        Click to replace with photo
+                      </span>
+                    </div>
                   ) : (
                     <>
                       <svg

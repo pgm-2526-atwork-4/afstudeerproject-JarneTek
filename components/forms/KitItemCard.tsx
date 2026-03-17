@@ -17,8 +17,7 @@ export default function   KitItemCard({ item, onAdd }: { item: KitItem, onAdd: (
   const [selectedSize, setSelectedSize] = useState(item.product.sizes[0] || "");
   const [selectedQuantity, setSelectedQuantity] = useState(1);
 
-  const itemPrice = item.type === "EXTRA" ? Number(item.customPrice ?? item.product.defaultPrice) : 0;
-
+  const itemPrice = Number(item.customPrice ?? item.product.defaultPrice) || 0;
 
   const handleAddToCart = () => {
     onAdd({

@@ -39,13 +39,17 @@ export async function register(formData: FormData) {
         email: formData.get("email"),
         password: formData.get("password"),
         clubName: formData.get("clubName"),
+        iban:  formData.get("iban") || null,
     });
     if (!parsed.success) {
         return { error: "Validation failed", fieldErrors: parsed.error.flatten().fieldErrors };
     }
+    const formattedIban = parsed.data.iban 
+        ? parsed.data.iban.replace(/\s+/g, "").toUpperCase() 
+        : null;
 
     try {
-        const { token } = await registerUser(parsed.data.email, parsed.data.password, parsed.data.clubName);
+        const { token } = await registerUser(parsed.data.email, parsed.data.password, parsed.data.clubName, formattedIban);
         
         cookies().set("token", token, {
             httpOnly: true,
