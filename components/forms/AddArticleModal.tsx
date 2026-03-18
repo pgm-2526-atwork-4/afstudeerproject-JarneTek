@@ -17,7 +17,6 @@ export default function AddArticleModal({ formId, onArticleAdded }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [selectedSizes, setSelectedSizes] = useState<string[]>(ADULT_SIZES);
   const [articleType, setArticleType] = useState<"BASIC" | "EXTRA">("BASIC");
-  const [imageUrl, setImageUrl] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [productName, setProductName] = useState("");
 
@@ -35,7 +34,6 @@ export default function AddArticleModal({ formId, onArticleAdded }: Props) {
       const url = await uploadImage(imageFormData);
       if (url) {
         formData.set("imageUrl", url);
-        setImageUrl(url);
       }
     }
 
@@ -49,7 +47,6 @@ export default function AddArticleModal({ formId, onArticleAdded }: Props) {
     setError(null);
     setSelectedSizes(ADULT_SIZES);
     setArticleType("BASIC");
-    setImageUrl("");
     setImagePreview(null);
     onArticleAdded();
     setProductName("");

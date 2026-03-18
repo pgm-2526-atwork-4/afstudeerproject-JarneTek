@@ -7,7 +7,6 @@ import { Form, FormItem, Product } from "@prisma/client";
 import AddArticleModal from "@/components/forms/AddArticleModal";
 import UpdateArticleModal from "@/components/forms/UpdateArticleModal";
 import DeleteFormItem from "@/components/forms/DeleteFormItem";
-import Image from "next/image";
 
 type FormWithItems = Form & { items: (FormItem & { product: Product })[] };
 

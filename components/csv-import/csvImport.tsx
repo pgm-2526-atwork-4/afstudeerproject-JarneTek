@@ -19,7 +19,7 @@ export default function CsvImport({ onSuccess }: { onSuccess?: () => void }) {
     if (acceptedFiles[0]) {
       Papa.parse(acceptedFiles[0], {
         header: true,
-        complete: (results: any) => {
+        complete: (results: { data: Record<string, string>[] }) => {
           console.log(results.data);
           setData(results.data);
           setPreviewData(results.data.slice(0, 5));
@@ -31,7 +31,7 @@ export default function CsvImport({ onSuccess }: { onSuccess?: () => void }) {
   const handleImport = () => {
     if (data) {
       try {
-        importMembers(data, selectedClub?.clubId!);
+        importMembers(data, selectedClub?.clubId ?? "");
         setFile(null);
         setPreviewData(null);
         setData(null);

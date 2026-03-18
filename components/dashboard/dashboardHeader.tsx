@@ -2,7 +2,7 @@
 import { usePathname } from "next/navigation";
 import { useClub } from "@/providers/clubprovider";
 
-export default function dashboardHeader() {
+export default function DashboardHeader() {
     const pathname = usePathname();
     const { selectedClub } = useClub();
     return (

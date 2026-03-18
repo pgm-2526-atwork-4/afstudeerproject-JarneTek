@@ -24,8 +24,8 @@ export async function login(formData: FormData) {
             path: "/",
         });
 
-    } catch (error: any) {
-        if (error.message === "User not found") {
+    } catch (error: unknown) {
+        if (error instanceof Error && error.message === "User not found") {
             return { fieldErrors: { email: ["No account found with this email"] } };
         }
         return { fieldErrors: { password: ["Invalid password"] } }
@@ -58,8 +58,8 @@ export async function register(formData: FormData) {
             maxAge: 60 * 60,
             path: "/",
         });
-    } catch (error: any) {
-        if (error.message === "User already exists") {
+    } catch (error: unknown) {
+        if (error instanceof Error && error.message === "User already exists") {
             return { fieldErrors: { email: ["An account with this email already exists"] } };
         }
         return { fieldErrors: { email: ["Registration failed. Please try again."] } };

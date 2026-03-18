@@ -4,14 +4,15 @@ import { useState, useEffect } from "react";
 import DeleteMember from "./DeleteMember";
 import EditMember from "./EditMember";
 import ManualOrderPopUp from "./ManualOrderPopUp";
-import { getClubMembers, toggleHasPaid } from "@/lib/actions/members";
+import { toggleHasPaid } from "@/lib/actions/members";
+import { Member } from "@prisma/client";
 import Pagination from "../pagination/pagination";
 
 export default function MembersTable({
   initialMembers,
   clubId,
 }: {
-  initialMembers: any[];
+  initialMembers: Member[];
   clubId: string;
 }) {
   const [groups, setGroups] = useState<string[]>([]);

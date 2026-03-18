@@ -146,7 +146,7 @@ export default function MemberFormItems({ form, token, memberId, clubId, onSucce
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800 mb-6 flex gap-3 shadow-sm">
             <span className="text-xl">ℹ️</span>
             <div>
-              <p className="font-semibold mb-1">Optionele Extra's</p>
+              <p className="font-semibold mb-1">Optionele Extra&apos;s</p>
               <p>Dit zijn extra artikelen bovenop uw basispakket. <strong>Let op:</strong> deze items zijn niet gratis en worden direct aan uw totaalbedrag toegevoegd. U ziet de prijsberekening onderaan bij uw besteloverzicht.</p>
             </div>
           </div>
