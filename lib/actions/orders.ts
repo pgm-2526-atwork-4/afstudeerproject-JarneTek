@@ -52,7 +52,7 @@ export async function getClubOrders(clubId: string, fittingDayId?: string) {
 export async function createManualOrder(memberId: string, items: { productId: string; size: string; quantity: number; price: number }[], clubId: string, totalPrice: number) {
     const session = await getSession();
     if (!session) {
-        throw new Error("No session found");
+        return { error: "No session found" };
     }
     const clubUser = await prisma.clubUser.findUnique({
         where: {
@@ -63,7 +63,13 @@ export async function createManualOrder(memberId: string, items: { productId: st
         },
     });
     if (!clubUser) {
-        throw new Error("Not authorized");
+        return { error: "Not authorized" };
+    }
+    if (items.length === 0) {
+        return { error: "Add at least one item to the order" };
+    }
+    if (totalPrice < 0) {
+        return { error: "Invalid total price" };
     }
     const order = await prisma.order.create({
         data: {
@@ -80,8 +86,8 @@ export async function createManualOrder(memberId: string, items: { productId: st
         },
     });
     return {
-        ...order,
-        totalPrice: Number(order.totalPrice),
+        success: true,
+        order: { ...order, totalPrice: Number(order.totalPrice) },
     };
 }
 
@@ -93,36 +99,29 @@ export async function createMemberOrder(token: string, totalPrice: number, items
         },
     });
     if (!member) {
-        throw new Error("No member found");
+        return { error: "Invalid or expired order link" };
     }
 
-    if (totalPrice === 0) {
-        const order = await prisma.order.create({
-        data: {
+    if (items.length === 0) {
+        return { error: "No items selected" };
+    }
+
+    const existingOrder = await prisma.order.findFirst({
+        where: {
             memberId: member.id,
-            totalPrice: totalPrice,
             fittingDayId: member.fittingDayId,
-            status: 'CONFIRMED',
-            items: {
-                create: items.map((item) => ({
-                    productId: item.productId,
-                    size: item.size,
-                    quantity: item.quantity,
-                    price: item.price,
-                })),
-            },
-        },    })
-        return {
-            ...order,
-            totalPrice: Number(order.totalPrice),
-        };
-        
-    } else {
+        },
+    });
+    if (existingOrder) {
+        return { error: "You have already placed an order for this fitting day" };
+    }
+
     const order = await prisma.order.create({
         data: {
             memberId: member.id,
             totalPrice: totalPrice,
             fittingDayId: member.fittingDayId,
+            status: totalPrice === 0 ? 'CONFIRMED' : 'PENDING',
             items: {
                 create: items.map((item) => ({
                     productId: item.productId,
@@ -134,10 +133,9 @@ export async function createMemberOrder(token: string, totalPrice: number, items
         },
     });
     return {
-        ...order,
-        totalPrice: Number(order.totalPrice),
+        success: true,
+        order: { ...order, totalPrice: Number(order.totalPrice) },
     };
-}
 }
 
 export async function getClubFittingDays(clubId: string) {

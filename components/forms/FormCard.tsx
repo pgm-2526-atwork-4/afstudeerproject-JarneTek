@@ -20,6 +20,7 @@ export default function FormCard({
   const [selectedGroups, setSelectedGroups] = useState<string[]>(
     form.targetGroups,
   );
+  const [error, setError] = useState<string | null>(null);
 
   const handleCheckbox = (group: string) => {
     if (selectedGroups.includes(group)) {
@@ -30,7 +31,11 @@ export default function FormCard({
   };
 
   const handleUpdateForm = async (formData: FormData) => {
-    await updateForm(form.id, formData);
+    const result = await updateForm(form.id, formData);
+    if(result?.error){
+      setError(result.error);
+      return;
+    }
     setMenuOpen(false);
     onFormUpdate();
   };
@@ -79,6 +84,7 @@ export default function FormCard({
             <h3 className="text-lg font-bold text-brand-navy">Edit Form</h3>
 
             <form action={handleUpdateForm} className="space-y-4">
+              {error && <p className="text-sm text-red-500">{error}</p>}
               <div>
                 <label className="text-sm font-medium text-brand-navy block mb-1">
                   Form Name

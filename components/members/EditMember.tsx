@@ -10,15 +10,20 @@ export default function EditMember({
   member: Member;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]> | null>(null);
 
   const handleSubmit = async (formData: FormData) => {
-    await updateMember(member.id, {
+    const result = await updateMember(member.id, {
       firstName: formData.get("firstName") as string,
       lastName: formData.get("lastName") as string,
       email: formData.get("email") as string,
       group: formData.get("group") as string,
     });
-    setIsOpen(false);
+    if (result?.error) {
+      setFieldErrors(result.error);
+    } else {
+      setIsOpen(false);
+    }
   };
 
   return (
@@ -39,18 +44,22 @@ export default function EditMember({
               <div>
                 <label htmlFor="firstName" className="block text-sm font-medium text-brand-navy mb-1">First Name</label>
                 <input type="text" name="firstName" id="firstName" defaultValue={member.firstName} required className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-green" />
+                {fieldErrors?.firstName && <p className="text-sm text-red-600">{fieldErrors.firstName[0]}</p>}
               </div>
               <div>
                 <label htmlFor="lastName" className="block text-sm font-medium text-brand-navy mb-1">Last Name</label>
                 <input type="text" name="lastName" id="lastName" defaultValue={member.lastName} required className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-green" />
+                {fieldErrors?.lastName && <p className="text-sm text-red-600">{fieldErrors.lastName[0]}</p>}
               </div>
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-brand-navy mb-1">Email</label>
                 <input type="email" name="email" id="email" defaultValue={member.email} required className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-green" />
+                {fieldErrors?.email && <p className="text-sm text-red-600">{fieldErrors.email[0]}</p>}
               </div>
               <div>
                 <label htmlFor="group" className="block text-sm font-medium text-brand-navy mb-1">Group</label>
                 <input type="text" name="group" id="group" defaultValue={member.group} required className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-green" />
+                {fieldErrors?.group && <p className="text-sm text-red-600">{fieldErrors.group[0]}</p>}
               </div>
 
               <div className="flex gap-3 pt-4">

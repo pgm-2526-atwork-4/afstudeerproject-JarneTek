@@ -25,10 +25,8 @@ export default function StartFittingDayModal() {
   const handleStartFittingDay = async (formData: FormData) => {
     setErrorField({});
     setError(null);
-    if (!selectedClub) return;
-    if (!selectedForm) {
-      throw new Error("Form not found");
-    }
+    if (!selectedClub) return setError("Club not found");
+    if (!selectedForm) return setError("Form not found");
     const result = await startFittingDay(
       selectedClub.clubId,
       selectedForm.id,

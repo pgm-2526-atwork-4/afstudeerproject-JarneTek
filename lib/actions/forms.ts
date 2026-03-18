@@ -57,7 +57,7 @@ export async function createForm(formData: FormData, clubId: string) {
     const session = await getSession();
     const userId = session?.id;
     if (!userId) {
-        return null;
+        return { error: "No session found" };
     }
     const clubUser = await prisma.clubUser.findUnique({
         where: {
@@ -68,7 +68,7 @@ export async function createForm(formData: FormData, clubId: string) {
         },
     });
     if (!clubUser) {
-        return null;
+        return { error: "Not authorized" };
     }
     const validatedData = createFormSchema.safeParse({
         name: formData.get("name"),
@@ -118,18 +118,18 @@ const createdProducts = [];
     })
     
         revalidatePath(`/dashboard/form-builder`);
-    return form
+    return {success: "Form created successfully",  form}
 }
 
 export async function updateForm(formId: string, formData: FormData) {
     const session = await getSession();
     const userId = session?.id;
-    if (!userId) return null;
+    if (!userId) return { error: "No session found" };
 
     const form = await prisma.form.findUnique({
         where: { id: formId },
     });
-    if (!form) return null;
+    if (!form) return { error: "Form not found" };
 
     const clubUser = await prisma.clubUser.findUnique({
         where: {
@@ -139,7 +139,7 @@ export async function updateForm(formId: string, formData: FormData) {
             },
         },
     });
-    if (!clubUser) return null;
+    if (!clubUser) return { error: "Not authorized" };
 
     const validatedData = createFormSchema.safeParse({
         name: formData.get("name"),
@@ -157,7 +157,7 @@ export async function updateForm(formId: string, formData: FormData) {
         },
     });
     revalidatePath(`/dashboard/form-builder`);
-    return updatedForm;
+    return {success: "Form updated successfully", updatedForm};
 }
 
 export async function getFormWithItems(formId: string) {
@@ -319,7 +319,7 @@ await prisma.product.update({
 export async function deleteFormItem(formItemId: string) {
     const session = await getSession();
     const userId = session?.id;
-    if (!userId) return null;
+    if (!userId) return { error: "No session found" };
 
     const formItem = await prisma.formItem.findUnique({
         where: { id: formItemId },
@@ -327,12 +327,12 @@ export async function deleteFormItem(formItemId: string) {
             form: true,
         },
     });
-    if (!formItem) return null;
+    if (!formItem) return { error: "Form item not found" };
 
     const product = await prisma.product.findUnique({
         where: { id: formItem.productId },
     });
-    if (!product) return null;
+    if (!product) return { error: "Product not found" };
 
     const clubUser = await prisma.clubUser.findUnique({
         where: {
@@ -342,7 +342,14 @@ export async function deleteFormItem(formItemId: string) {
             },
         },
     });
-    if (!clubUser) return null;
+    if (!clubUser) return { error: "Not authorized" };
+
+    const orderItemCount = await prisma.orderItem.count({
+        where: { productId: formItem.productId },
+    });
+    if (orderItemCount > 0) {
+        return { error: "Cannot delete: this article has existing orders" };
+    }
 
     await prisma.formItem.delete({
         where: { id: formItemId },
@@ -351,7 +358,7 @@ export async function deleteFormItem(formItemId: string) {
         where: { id: formItem.productId },
     });
     revalidatePath(`/dashboard/form-builder/${formItem.formId}`);
-    return true;
+    return { success: true };
 }
 
 export async function getFormItemsForMember(memberId: string) {

@@ -31,6 +31,7 @@ export default function MemberFormItems({ form, token, memberId, clubId, onSucce
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showExtraPopup, setShowExtraPopup] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   function handleAddToCart(item: CartItem) {
@@ -62,6 +63,7 @@ export default function MemberFormItems({ form, token, memberId, clubId, onSucce
 
   const handleCheckout = async () => {
     if (cartItems.length === 0) return;
+    setError(null);
     setIsSubmitting(true);
 
     const items = cartItems.map((item) => ({
@@ -72,10 +74,20 @@ export default function MemberFormItems({ form, token, memberId, clubId, onSucce
     }));
 
     if (token) {
-      const newOrder = await createMemberOrder(token, totalPrice, items);
-      router.push(`/checkout/success?orderId=${newOrder.id}&token=${token}`);
+      const result = await createMemberOrder(token, totalPrice, items);
+      if (result.error) {
+        setError(result.error);
+        setIsSubmitting(false);
+        return;
+      }
+      router.push(`/checkout/success?orderId=${result.order?.id}&token=${token}`);
     } else {
-      await createManualOrder(memberId!, items, clubId!, totalPrice);
+      const result = await createManualOrder(memberId!, items, clubId!, totalPrice);
+      if (result.error) {
+        setError(result.error);
+        setIsSubmitting(false);
+        return;
+      }
       setCartItems([]);
       setIsSubmitting(false);
       onSuccess?.();
@@ -146,13 +158,17 @@ export default function MemberFormItems({ form, token, memberId, clubId, onSucce
         </>
       )}
 
-      {/* Cindeart */}
+      {/* Cart */}
       <div className="mt-8 bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
         <h3 className="text-lg font-bold text-brand-navy mb-4">
           Jouw bestelling ({cartItems.length} {cartItems.length === 1 ? "item" : "items"})
         </h3>
 
-        {cartItems.length === 0 ? (
+        {error && (
+          <p className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mb-4">
+            {error}
+          </p>
+        )}        {cartItems.length === 0 ? (
           <p className="text-gray-400 text-sm">
             Voeg artikelen toe aan je bestelling.
           </p>

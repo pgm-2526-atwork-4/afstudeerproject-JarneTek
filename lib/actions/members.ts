@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getSession } from "@/lib/auth";
 import { updateMemberSchema } from "@/lib/validations/members";
 
+
 export async function getClubMembers(clubId: string) {
     const session = await getSession();
     if (!session) {
@@ -130,6 +131,11 @@ export async function updateMember(memberId: string, data: {
     email: string;
     group: string;
 }) {
+    const validatedData = updateMemberSchema.safeParse(data);
+    if (!validatedData.success) {
+        return { error: validatedData.error.flatten().fieldErrors };
+    }
+
     const session = await getSession();
     if (!session) {
         throw new Error("No session found");
@@ -153,17 +159,16 @@ export async function updateMember(memberId: string, data: {
     if (!clubUser) {
         throw new Error("Not authorized");
     }
-    const validatedData = updateMemberSchema.parse(data);
 
     await prisma.member.update({
         where: {
             id: memberId,
         },
         data: {
-            firstName: validatedData.firstName,
-            lastName: validatedData.lastName,
-            email: validatedData.email,
-            group: validatedData.group,
+            firstName: validatedData.data.firstName,
+            lastName: validatedData.data.lastName,
+            email: validatedData.data.email,
+            group: validatedData.data.group,
         },
     });
     revalidatePath(`/dashboard/members`);
@@ -172,7 +177,16 @@ export async function updateMember(memberId: string, data: {
 export async function deleteMember(memberId: string) {
     const session = await getSession();
     if (!session) {
-        throw new Error("No session found");
+        return { error: "No session found" };
+    }
+    const orders = await prisma.order.findMany({
+        where: {
+            memberId: memberId,
+        },
+    });
+
+    if (orders.length > 0) {
+        return { error: "Member has orders" };
     }
     const member = await prisma.member.findUnique({
         where: {
@@ -180,7 +194,7 @@ export async function deleteMember(memberId: string) {
         },
     });
     if (!member) {
-        throw new Error("Member not found");
+        return { error: "Member not found" };
     }
     const clubUser = await prisma.clubUser.findUnique({
         where: {
@@ -191,7 +205,7 @@ export async function deleteMember(memberId: string) {
         },
     });
     if (!clubUser) {
-        throw new Error("Not authorized");
+        return { error: "Not authorized" };
     }
 
     await prisma.member.delete({

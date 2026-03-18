@@ -14,8 +14,7 @@ export default function FormBuilderPage() {
   const formRef = useRef<HTMLFormElement>(null);
   const [members, setMembers] = useState<Member[]>([]);
   const [membersLoaded, setMembersLoaded] = useState(false);
-
-
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!selectedClub) return;
@@ -50,7 +49,11 @@ export default function FormBuilderPage() {
 
   const handleCreateForm = async (formData: FormData) => {
     if (!selectedClub) return;
-    await createForm(formData, selectedClub.club.id);
+    const result = await createForm(formData, selectedClub.club.id);
+    if (result?.error) {
+      setError(result.error);
+      return;
+    }
     formRef.current?.reset();
     const updated = await getFormsByClubId(selectedClub.club.id);
     if (updated) setForms(updated);
@@ -80,7 +83,6 @@ export default function FormBuilderPage() {
       />
     );
   }
-
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
@@ -164,6 +166,8 @@ export default function FormBuilderPage() {
                 ))}
               </div>
             </div>
+            {error && <p className="text-sm text-red-500">{error}</p>}
+
             <button
               type="submit"
               className="bg-brand-navy text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-green transition-colors"

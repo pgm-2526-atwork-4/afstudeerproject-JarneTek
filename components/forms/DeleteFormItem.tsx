@@ -11,12 +11,14 @@ type Props = {
 
 export default function DeleteFormItem({ formItemId, onDeleted }: Props) {
     const [modalOpen, setModalOpen] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
   return (
     <>
     <button
       onClick={async () => {
         setModalOpen(true);
+        setError(null);
       }}
       className="text-gray-300 hover:text-red-400 text-lg leading-none transition-colors"
     >
@@ -33,6 +35,11 @@ export default function DeleteFormItem({ formItemId, onDeleted }: Props) {
             >
                 <h2 className="text-lg font-bold mb-4">Delete Form Item</h2>
                 <p className="mb-4">Are you sure you want to delete this form item?</p>
+                {error && (
+                    <p className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mb-4">
+                        {error}
+                    </p>
+                )}
                 <div className="flex justify-end gap-2">
                     <button
                         onClick={() => setModalOpen(false)}
@@ -42,7 +49,11 @@ export default function DeleteFormItem({ formItemId, onDeleted }: Props) {
                     </button>
                     <button
                         onClick={async () => {
-                            await deleteFormItem(formItemId);
+                            const result = await deleteFormItem(formItemId);
+                            if (result?.error) {
+                                setError(result.error);
+                                return;
+                            }
                             onDeleted();
                             setModalOpen(false);
                         }}

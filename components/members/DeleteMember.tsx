@@ -11,11 +11,16 @@ export default function DeleteMember({
   onClose: () => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleDelete = async () => {
-    await deleteMember(memberId);
-    setIsOpen(false);
-    onClose();
+    const result = await deleteMember(memberId);
+    if (result?.error) {
+      setError(result.error);
+    } else {
+      setIsOpen(false);
+      onClose();
+    }
   };
 
   return (
@@ -32,6 +37,7 @@ export default function DeleteMember({
           <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-md">
             <h2 className="text-xl font-semibold text-brand-navy mb-2">Delete Member</h2>
             <p className="text-sm text-gray-600 mb-4">Are you sure you want to delete this member? This action cannot be undone.</p>
+            {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
 
             <div className="flex gap-3">
               <button

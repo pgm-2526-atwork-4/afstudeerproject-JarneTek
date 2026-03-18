@@ -4,7 +4,10 @@ export const createClubSchema = z.object({
     name: z.string().min(1, "Club name is required").max(100, "Club name is too long"),
     primaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Invalid color format"),
     secondaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Invalid color format").optional(),
-    iban: z.string().optional(), 
+    iban: z.string()
+        .regex(/^[A-Z]{2}[0-9]{2}[A-Z0-9]{11,30}$/i, "Invalid IBAN format")
+        .or(z.literal(""))
+        .optional(), 
 });
 
 export type CreateClubSchema = z.infer<typeof createClubSchema>;
