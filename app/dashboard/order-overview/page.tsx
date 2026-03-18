@@ -5,6 +5,7 @@ import { getClubOrders, getClubFittingDays, confirmOrder } from "@/lib/actions/o
 import { useState, useEffect } from "react";
 import { Order, OrderItem, Member, Product, FittingDay } from "@prisma/client";
 import { printOrderPDF } from "@/lib/helpers/print";
+import Pagination from "@/components/pagination/pagination";
 
 
 type OrderWithDetails = Omit<Order, "totalPrice"> & {
@@ -25,6 +26,8 @@ export default function OrdersPage() {
   const [confirmingOrderId, setConfirmingOrderId] = useState<string | null>(null);
   const [confirmMessage, setConfirmMessage] = useState<string | null>(null);
   const [confirmError, setConfirmError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
 
   const handleConfirmOrder = async (orderId: string) => {
     setConfirmError(null);
@@ -65,7 +68,8 @@ export default function OrdersPage() {
         setOrders(data as OrderWithDetails[]),
       );
     }
-  }, [selectedClub, activeFittingDay]);
+    setCurrentPage(1);
+  }, [selectedClub, activeFittingDay, activeTab]);
 
   if (!selectedClub) {
     return (
@@ -107,8 +111,16 @@ export default function OrdersPage() {
       }
     });
   });
+  
+  const totalSummaryPages = Math.ceil(summaryItems.length / pageSize);
+  const paginatedSummaryItems = summaryItems.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  const totalIndividualPages = Math.ceil(orders.length / pageSize);
+  const paginatedIndividualOrders = orders.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const pendingOrders = orders.filter((o) => o.status === "PENDING");
+  const totalPendingPages = Math.ceil(pendingOrders.length / pageSize);
+  const paginatedPendingOrders = pendingOrders.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <div className="flex-1 overflow-auto p-6">
@@ -184,35 +196,42 @@ export default function OrdersPage() {
                 No orders yet.
               </div>
             ) : (
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-gray-50 border-b border-gray-200 text-left text-brand-navy">
-                    <th className="px-4 py-3 font-semibold">Article</th>
-                    <th className="px-4 py-3 font-semibold">Size</th>
-                    <th className="px-4 py-3 font-semibold">Total Quantity</th>
-                    <th className="px-4 py-3 font-semibold">Total Price</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {summaryItems.map((item, i) => (
-                    <tr
-                      key={i}
-                      className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
-                    >
-                      <td className="px-4 py-3 font-medium text-brand-navy">
-                        {item.productName}
-                      </td>
-                      <td className="px-4 py-3 text-gray-500">{item.size}</td>
-                      <td className="px-4 py-3 text-gray-500">
-                        {item.quantity}x
-                      </td>
-                      <td className="px-4 py-3 text-gray-500">
-                        {item.totalPrice.toFixed(2)} EUR
-                      </td>
+              <>
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-gray-50 border-b border-gray-200 text-left text-brand-navy">
+                      <th className="px-4 py-3 font-semibold">Article</th>
+                      <th className="px-4 py-3 font-semibold">Size</th>
+                      <th className="px-4 py-3 font-semibold">Total Quantity</th>
+                      <th className="px-4 py-3 font-semibold">Total Price</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {paginatedSummaryItems.map((item, i) => (
+                      <tr
+                        key={i}
+                        className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                      >
+                        <td className="px-4 py-3 font-medium text-brand-navy">
+                          {item.productName}
+                        </td>
+                        <td className="px-4 py-3 text-gray-500">{item.size}</td>
+                        <td className="px-4 py-3 text-gray-500">
+                          {item.quantity}x
+                        </td>
+                        <td className="px-4 py-3 text-gray-500">
+                          {item.totalPrice.toFixed(2)} EUR
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <Pagination 
+                  currentPage={currentPage}
+                  totalPages={totalSummaryPages}
+                  onPageChange={setCurrentPage}
+                />
+              </>
             )}
           </div>
         )}
@@ -224,7 +243,7 @@ export default function OrdersPage() {
                 No orders yet.
               </div>
             ) : (
-              orders.map((order) => (
+              paginatedIndividualOrders.map((order) => (
                 <div
                   key={order.id}
                   className="bg-white border border-gray-200 rounded-xl p-4 space-y-3"
@@ -278,6 +297,11 @@ export default function OrdersPage() {
                 </div>
               ))
             )}
+            <Pagination 
+              currentPage={currentPage}
+              totalPages={totalIndividualPages}
+              onPageChange={setCurrentPage}
+            />
           </div>
         )}
         {activeTab === "pending" && (
@@ -303,7 +327,7 @@ export default function OrdersPage() {
                 No pending orders left to confirm.
               </div>
             ) : (
-              pendingOrders.map((order) => (
+              paginatedPendingOrders.map((order) => (
                 <div
                   key={order.id}
                   className="rounded-xl border border-gray-200 bg-white p-4"
@@ -350,6 +374,11 @@ export default function OrdersPage() {
                 </div>
               ))
             )}
+            <Pagination 
+              currentPage={currentPage}
+              totalPages={totalPendingPages}
+              onPageChange={setCurrentPage}
+            />
           </div>
         )}
       </div>
