@@ -1,7 +1,7 @@
 "use client";
 
 import { getMemberFormItemsFromToken } from "@/lib/actions/members";
-import KitItemCard from "../forms/KitItemCard";
+import KitItemCard from "../kit-builder/KitItemCard";
 import { createMemberOrder, createManualOrder } from "@/lib/actions/orders";
 import { calculateCartTotal } from "@/lib/helpers/cart";
 import { useState } from "react";

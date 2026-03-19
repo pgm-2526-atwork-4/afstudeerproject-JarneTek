@@ -1,9 +1,9 @@
 import { getFormsByClubId } from "@/lib/actions/forms";
 import { getClubMembers } from "@/lib/actions/members";
-import FormCard from "@/components/forms/FormCard";
+import FormCard from "@/components/kit-builder/FormCard";
 import NoMembersState from "@/components/dashboard/NoMembersState";
 import { getActiveClubCookie, getSelectedClub } from "@/lib/actions/active-club";
-import CreateKitForm from "@/components/forms/CreateKitForm";
+import CreateKitForm from "@/components/kit-builder/CreateKitForm";
 
 export default async function FormBuilderPage() {
   const clubid = await getActiveClubCookie();

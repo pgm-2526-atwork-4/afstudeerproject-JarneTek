@@ -1,17 +1,17 @@
-
 import { getFormWithItems } from "@/lib/actions/forms";
 import { Form, FormItem, Product } from "@prisma/client";
-import AddArticleModal from "@/components/forms/AddArticleModal";
-import UpdateArticleModal from "@/components/forms/UpdateArticleModal";
-import DeleteFormItem from "@/components/forms/DeleteFormItem";
-import { revalidatePath } from "next/cache";
-
+import AddArticleModal from "@/components/kit-builder/AddArticleModal";
+import FormItemList from "@/components/kit-builder/FormItemList";
+import FormItemPreviewSection from "@/components/kit-builder/FormItemPreviewSection";
 
 type FormWithItems = Form & { items: (FormItem & { product: Product })[] };
 
-export default async function FormDetailPage({ params }: { params: { formId: string } }) {
+export default async function FormDetailPage({
+  params,
+}: {
+  params: { formId: string };
+}) {
   const formId = params.formId as string;
-
   const form = await getFormWithItems(formId);
 
   if (!form) {
@@ -48,62 +48,10 @@ export default async function FormDetailPage({ params }: { params: { formId: str
         </div>
 
         <div className="p-4">
-          <AddArticleModal
-            formId={formId}
-          />
+          <AddArticleModal formId={formId} />
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-3">
-          {form.items.length === 0 ? (
-            <p className="text-xs text-gray-400 text-center py-6">
-              No articles yet.
-            </p>
-          ) : (
-            form.items.map((item) => (
-              <div
-                key={item.id}
-                className="border border-gray-200 rounded-xl p-3 space-y-2"
-              >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="font-semibold text-brand-navy text-sm">
-                      {item.product.name}
-                    </p>
-                    <p className="text-xs text-gray-400">
-                      {item.product.sizes.length} sizes
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <UpdateArticleModal
-                      formItemId={item.id}
-                      item={item}
-                    />
-                    <DeleteFormItem
-                      formItemId={item.id}
-                    />
-                  </div>
-                </div>
-
-                <div className="flex rounded-lg border border-gray-200 overflow-hidden text-xs">
-                  <div
-                    className={`flex-1 py-1 text-center font-medium ${item.type === "BASIC" ? "bg-brand-navy text-white" : "text-gray-400"}`}
-                  >
-                    Basis Pakket
-                  </div>
-                  <div
-                    className={`flex-1 py-1 text-center font-medium ${item.type === "EXTRA" ? "bg-brand-navy text-white" : "text-gray-400"}`}
-                  >
-                    Extra
-                  </div>
-                </div>
-
-                <p className="text-xs text-gray-400">
-                  Sizes: {item.product.sizes.join(", ")}
-                </p>
-              </div>
-            ))
-          )}
-        </div>
+        <FormItemList form={form} />
       </div>
 
       <div className="flex-1 flex flex-col overflow-hidden bg-gray-50">
@@ -134,7 +82,7 @@ export default async function FormDetailPage({ params }: { params: { formId: str
               <p>Add articles to see the member preview.</p>
             </div>
           ) : (
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm w-full max-w-xl mx-auto p-6 space-y-6">
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm w-full max-w-xl mx-auto p-8 space-y-8">
               <div>
                 <h1 className="text-2xl font-bold text-brand-navy">
                   Select Your Kit
@@ -144,104 +92,17 @@ export default async function FormDetailPage({ params }: { params: { formId: str
                 </p>
               </div>
 
-              {basicItems.length > 0 && (
-                <div className="space-y-4">
-                  <div>
-                    <h2 className="font-bold text-brand-navy">Basis Pakket</h2>
-                    <p className="text-xs text-brand-green">
-                      Inbegrepen met lidgeld
-                    </p>
-                  </div>
-                  {basicItems.map((item) => (
-                    <div
-                      key={item.id}
-                      className="border border-gray-200 rounded-xl overflow-hidden bg-white"
-                    >
-                      <div className="w-full h-48 bg-gray-50 border-b border-gray-100 flex items-center justify-center p-4">
-                        {item.product.imageUrl ? (
-                          <img
-                            src={item.product.imageUrl}
-                            alt={item.product.name}
-                            className="max-w-full max-h-full object-contain mix-blend-multiply"
-                          />
-                        ) : (
-                          <div className="flex flex-col items-center justify-center text-center opacity-60">
-                            <div className="w-16 h-16 bg-brand-green/10 text-brand-green rounded-2xl flex items-center justify-center mb-2 shadow-sm p-2">
-                              <span className="text-[10px] font-bold leading-tight uppercase break-words overflow-hidden line-clamp-2">
-                                {item.product.name}
-                              </span>
-                            </div>
-                            <span className="text-xs text-gray-400">Geen foto</span>
-                          </div>
-                        )}
-                      </div>
+              <FormItemPreviewSection
+                title="Basis Pakket"
+                subtitle="Inbegrepen met lidgeld"
+                items={basicItems}
+              />
 
-                      <div className="p-4 space-y-2">
-                        <p className="font-semibold text-brand-navy">
-                          {item.product.name}
-                        </p>
-                        <p className="text-xs text-gray-400">Select Size</p>
-                        <select className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-white focus:border-brand-green outline-none transition-colors">
-                          <option value="">Choose a size...</option>
-                          {item.product.sizes.map((size) => (
-                            <option key={size} value={size}>{size}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {extraItems.length > 0 && (
-                <div className="space-y-4">
-                  <div>
-                    <h2 className="font-bold text-brand-navy">Extra&apos;s</h2>
-                    <p className="text-xs text-gray-400">
-                      Optioneel — apart te betalen
-                    </p>
-                  </div>
-                  {extraItems.map((item) => (
-                    <div
-                      key={item.id}
-                      className="border border-gray-200 rounded-xl overflow-hidden bg-white"
-                    >
-                      <div className="w-full h-48 bg-gray-50 border-b border-gray-100 flex items-center justify-center p-4">
-                        {item.product.imageUrl ? (
-                          <img
-                            src={item.product.imageUrl}
-                            alt={item.product.name}
-                            className="max-w-full max-h-full object-contain mix-blend-multiply"
-                          />
-                        ) : (
-                          <div className="flex flex-col items-center justify-center text-center opacity-60">
-                            <div className="w-16 h-16 bg-brand-navy/5 text-brand-navy rounded-2xl flex items-center justify-center mb-2 shadow-sm p-2">
-                              <span className="text-[10px] font-bold leading-tight uppercase break-words overflow-hidden line-clamp-2">
-                                {item.product.name}
-                              </span>
-                            </div>
-                            <span className="text-xs text-gray-400">Geen foto</span>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="p-4 space-y-2">
-                        <p className="font-semibold text-brand-navy">
-                          {item.product.name}
-                        </p>
-                        <p className="text-xs text-gray-400">Select Size</p>
-                        <select className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-white focus:border-brand-green outline-none transition-colors">
-                          <option value="">Choose a size...</option>
-                          {item.product.sizes.map((size) => (
-                            <option key={size} value={size}>{size}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
+              <FormItemPreviewSection
+                title="Extra's"
+                subtitle="Optioneel — apart te betalen"
+                items={extraItems}
+              />
             </div>
           )}
         </div>

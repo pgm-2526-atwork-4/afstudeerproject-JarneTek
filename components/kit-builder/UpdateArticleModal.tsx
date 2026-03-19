@@ -14,7 +14,7 @@ type Props = {
   item: FormItem & { product: Product };
 };
 
-export default function AddArticleModal({
+export default function UpdateArticleModal({
   formItemId,
   item
 }: Props) {
