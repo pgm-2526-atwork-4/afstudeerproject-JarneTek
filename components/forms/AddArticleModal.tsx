@@ -10,10 +10,9 @@ const KIDS_SIZES = ["104", "116", "128", "140", "152", "164"];
 
 type Props = {
   formId: string;
-  onArticleAdded: () => void;
 };
 
-export default function AddArticleModal({ formId, onArticleAdded }: Props) {
+export default function AddArticleModal({ formId }: Props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedSizes, setSelectedSizes] = useState<string[]>(ADULT_SIZES);
@@ -49,7 +48,6 @@ export default function AddArticleModal({ formId, onArticleAdded }: Props) {
     setSelectedSizes(ADULT_SIZES);
     setArticleType("BASIC");
     setImagePreview(null);
-    onArticleAdded();
     setProductName("");
   };
 

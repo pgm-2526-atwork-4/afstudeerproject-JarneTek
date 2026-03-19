@@ -26,7 +26,9 @@ export async function getClubMembers(clubId: string) {
             clubId: clubId,
         },
     });
+    revalidatePath(`/dashboard/form-builder`);
     return members;
+
 }
 
 export async function toggleHasPaid(memberId: string) {

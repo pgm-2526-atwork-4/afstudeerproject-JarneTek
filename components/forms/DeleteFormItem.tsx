@@ -6,10 +6,9 @@ import { useState } from "react";
 
 type Props = {
   formItemId: string;
-  onDeleted: () => void;
 };
 
-export default function DeleteFormItem({ formItemId, onDeleted }: Props) {
+export default function DeleteFormItem({ formItemId }: Props) {
     const [modalOpen, setModalOpen] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -54,7 +53,6 @@ export default function DeleteFormItem({ formItemId, onDeleted }: Props) {
                                 setError(result.error);
                                 return;
                             }
-                            onDeleted();
                             setModalOpen(false);
                         }}
                         className="bg-red-500 text-white px-4 py-2 rounded-lg"

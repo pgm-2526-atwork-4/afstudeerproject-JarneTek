@@ -8,13 +8,11 @@ import { useState } from "react";
 type FormCardProps = {
   form: Form;
   allGroups: string[];
-  onFormUpdate: () => void;
 };
 
 export default function FormCard({
   form,
   allGroups,
-  onFormUpdate,
 }: FormCardProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedGroups, setSelectedGroups] = useState<string[]>(
@@ -38,7 +36,6 @@ export default function FormCard({
       return;
     }
     setShowDeleteModal(false);
-    onFormUpdate();
   };
 
   const handleUpdateForm = async (formData: FormData) => {
@@ -48,7 +45,6 @@ export default function FormCard({
       return;
     }
     setMenuOpen(false);
-    onFormUpdate();
   };
 
   return (

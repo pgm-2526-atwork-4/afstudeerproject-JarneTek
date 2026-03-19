@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { prisma } from "@/lib/db";
 
 export async function setActiveClubCookie(clubId: string) {
     const cookieStore = await cookies();
@@ -17,4 +18,13 @@ export async function setActiveClubCookie(clubId: string) {
 export async function getActiveClubCookie() {
     const cookieStore = await cookies();
     return cookieStore.get("activeClub")?.value || null;
+}
+
+export async function getSelectedClub(clubId: string) {
+    const club = await prisma.club.findUnique({
+        where: {
+            id: clubId,
+        },
+    });
+    return club;
 }

@@ -1,24 +1,18 @@
-"use client";
 
-import { useParams } from "next/navigation";
 import { getFormWithItems } from "@/lib/actions/forms";
-import { useState, useEffect } from "react";
 import { Form, FormItem, Product } from "@prisma/client";
 import AddArticleModal from "@/components/forms/AddArticleModal";
 import UpdateArticleModal from "@/components/forms/UpdateArticleModal";
 import DeleteFormItem from "@/components/forms/DeleteFormItem";
+import { revalidatePath } from "next/cache";
+
 
 type FormWithItems = Form & { items: (FormItem & { product: Product })[] };
 
-export default function FormDetailPage() {
-  const params = useParams();
+export default async function FormDetailPage({ params }: { params: { formId: string } }) {
   const formId = params.formId as string;
 
-  const [form, setForm] = useState<FormWithItems | null>(null);
-
-  useEffect(() => {
-    getFormWithItems(formId).then(setForm);
-  }, [formId]);
+  const form = await getFormWithItems(formId);
 
   if (!form) {
     return (
@@ -56,7 +50,6 @@ export default function FormDetailPage() {
         <div className="p-4">
           <AddArticleModal
             formId={formId}
-            onArticleAdded={() => getFormWithItems(formId).then(setForm)}
           />
         </div>
 
@@ -84,13 +77,9 @@ export default function FormDetailPage() {
                     <UpdateArticleModal
                       formItemId={item.id}
                       item={item}
-                      onArticleUpdate={() =>
-                        getFormWithItems(formId).then(setForm)
-                      }
                     />
                     <DeleteFormItem
                       formItemId={item.id}
-                      onDeleted={() => getFormWithItems(formId).then(setForm)}
                     />
                   </div>
                 </div>
@@ -168,7 +157,6 @@ export default function FormDetailPage() {
                       key={item.id}
                       className="border border-gray-200 rounded-xl overflow-hidden bg-white"
                     >
-                      {/* AANGEPAST: Vaste hoogte (h-48), lichte achtergrond en object-contain */}
                       <div className="w-full h-48 bg-gray-50 border-b border-gray-100 flex items-center justify-center p-4">
                         {item.product.imageUrl ? (
                           <img
@@ -218,7 +206,6 @@ export default function FormDetailPage() {
                       key={item.id}
                       className="border border-gray-200 rounded-xl overflow-hidden bg-white"
                     >
-                      {/* AANGEPAST: Zelfde logica toegepast op de Extra items ipv de grijze placeholder */}
                       <div className="w-full h-48 bg-gray-50 border-b border-gray-100 flex items-center justify-center p-4">
                         {item.product.imageUrl ? (
                           <img

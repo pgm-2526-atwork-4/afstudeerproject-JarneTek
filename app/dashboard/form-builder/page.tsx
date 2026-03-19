@@ -1,41 +1,24 @@
-"use client";
-
-import { useEffect, useRef, useState } from "react";
-import { Form, Member } from "@prisma/client";
-import { useClub } from "@/providers/clubprovider";
-import { getFormsByClubId, createForm } from "@/lib/actions/forms";
+import { getFormsByClubId } from "@/lib/actions/forms";
 import { getClubMembers } from "@/lib/actions/members";
 import FormCard from "@/components/forms/FormCard";
 import NoMembersState from "@/components/dashboard/NoMembersState";
-import LoadingButton from "@/components/ui/LoadingButton";
+import { getActiveClubCookie, getSelectedClub } from "@/lib/actions/active-club";
+import CreateKitForm from "@/components/forms/CreateKitForm";
 
-export default function FormBuilderPage() {
-  const { selectedClub } = useClub();
-  const [forms, setForms] = useState<Form[]>([]);
-  const formRef = useRef<HTMLFormElement>(null);
-  const [members, setMembers] = useState<Member[]>([]);
-  const [membersLoaded, setMembersLoaded] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export default async function FormBuilderPage() {
+  const clubid = await getActiveClubCookie();
 
-  useEffect(() => {
-    if (!selectedClub) return;
-    getFormsByClubId(selectedClub.club.id).then((data) => {
-      if (data) setForms(data);
-    });
-  }, [selectedClub]);
+  if (!clubid) {
+    return (
+      <div className="flex-1 flex items-center justify-center text-gray-400">
+        Please select a club...
+      </div>
+    );
+  }
 
-  const fetchMembers = (clubId: string) => {
-    setMembersLoaded(false);
-    getClubMembers(clubId).then((data) => {
-      if (data) setMembers(data);
-      setMembersLoaded(true);
-    });
-  };
-
-  useEffect(() => {
-    if (!selectedClub) return;
-    fetchMembers(selectedClub.club.id);
-  }, [selectedClub]);
+  const forms = (await getFormsByClubId(clubid)) || [];
+  const members = (await getClubMembers(clubid)) || [];
+  const selectedClub = await getSelectedClub(clubid);
 
   const uniqueGroups = [...new Set(members.map((member) => member.group))].sort(
     (a, b) => {
@@ -48,27 +31,7 @@ export default function FormBuilderPage() {
     },
   );
 
-  const handleCreateForm = async (formData: FormData) => {
-    if (!selectedClub) return;
-    const result = await createForm(formData, selectedClub.club.id);
-    if (result?.error) {
-      setError(result.error);
-      return;
-    }
-    formRef.current?.reset();
-    const updated = await getFormsByClubId(selectedClub.club.id);
-    if (updated) setForms(updated);
-  };
-
-  if (!selectedClub) {
-    return (
-      <div className="flex-1 flex items-center justify-center text-gray-400">
-        Please select a club...
-      </div>
-    );
-  }
-
-  if (!membersLoaded) {
+  if (!members) {
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="w-6 h-6 border-2 border-brand-green border-t-transparent rounded-full animate-spin" />
@@ -76,11 +39,11 @@ export default function FormBuilderPage() {
     );
   }
 
-  if (membersLoaded && members.length === 0) {
+  if (members.length === 0) {
     return (
       <NoMembersState
-        clubName={selectedClub?.club?.name}
-        onMembersImported={() => fetchMembers(selectedClub!.club.id)}
+        clubName={selectedClub?.name}
+        onMembersImported={() => getClubMembers(clubid)}
       />
     );
   }
@@ -124,61 +87,14 @@ export default function FormBuilderPage() {
                   key={form.id}
                   form={form}
                   allGroups={uniqueGroups}
-                  onFormUpdate={() =>
-                    getFormsByClubId(selectedClub.club.id).then((data) => {
-                      if (data) setForms(data);
-                    })
-                  }
                 />
               ))}
             </div>
           )}
 
-          <form
-            ref={formRef}
-            action={handleCreateForm}
-            className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm space-y-3"
-          >
-            <h3 className="font-bold text-brand-navy">New Kit</h3>
-            <input
-              type="text"
-              name="name"
-              placeholder="Kit name (e.g. First Team 2024)"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-brand-green"
-            />
-            <div>
-              <p className="text-sm font-medium text-brand-navy mb-2">
-                Target Groups
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {uniqueGroups.map((group) => (
-                  <label
-                    key={group}
-                    className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-sm cursor-pointer hover:bg-gray-100 transition-colors"
-                  >
-                    <input
-                      type="checkbox"
-                      name="targetGroups"
-                      value={group}
-                      className="accent-brand-green"
-                    />
-                    {group}
-                  </label>
-                ))}
-              </div>
-            </div>
-            {error && <p className="text-sm text-red-500">{error}</p>}
-
-            <LoadingButton
-              type="submit"
-              loadingText="Adding..."
-              className="bg-brand-navy text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-green transition-colors"
-            >
-              + Create Kit
-            </LoadingButton>
-          </form>
+          <CreateKitForm clubId={clubid} uniqueGroups={uniqueGroups} />
         </div>
-      </div>²
+      </div>
     </div>
   );
 }

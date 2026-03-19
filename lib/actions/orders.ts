@@ -91,7 +91,6 @@ export async function createManualOrder(memberId: string, items: { productId: st
     };
 }
 
-
 export async function createMemberOrder(token: string, totalPrice: number, items: { productId: string; size: string; quantity: number; price: number }[]) {
     const member = await prisma.member.findUnique({
         where: {
