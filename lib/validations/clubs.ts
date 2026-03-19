@@ -5,8 +5,12 @@ export const createClubSchema = z.object({
     primaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Invalid color format"),
     secondaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Invalid color format").optional(),
     iban: z.string()
-        .regex(/^[A-Z]{2}[0-9]{2}[A-Z0-9]{11,30}$/i, "Invalid IBAN format")
-        .or(z.literal(""))
+        .transform((val) => val.replace(/\s+/g, ""))
+        .pipe(
+            z.string()
+                .regex(/^[A-Z]{2}[0-9]{2}[A-Z0-9]{11,30}$/i, "Invalid IBAN format")
+                .or(z.literal(""))
+        )
         .optional(), 
 });
 

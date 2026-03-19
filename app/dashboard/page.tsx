@@ -1,13 +1,10 @@
 
-"use client";
 
-import { useClub } from "@/providers/clubprovider";
 import { getDashboardStats } from "@/lib/actions/dashboard";
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import StartFittingDayModal from "@/components/dashboard/startFittingDayModal";
+import { getActiveClubCookie, getSelectedClub } from "@/lib/actions/active-club";
 
-type DashboardData = Awaited<ReturnType<typeof getDashboardStats>>;
 
 const STATUS_COLORS: Record<string, string> = {
   PENDING: "bg-yellow-100 text-yellow-700",
@@ -17,20 +14,8 @@ const STATUS_COLORS: Record<string, string> = {
   DELIVERED: "bg-green-100 text-green-700",
 };
 
-export default function DashboardPage() {
-  const { selectedClub } = useClub();
-  const [stats, setStats] = useState<DashboardData | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (selectedClub) {
-      setLoading(true);
-      getDashboardStats(selectedClub.clubId)
-        .then(setStats)
-        .finally(() => setLoading(false));
-    }
-  }, [selectedClub]);
-
+export default async function DashboardPage() {
+  const selectedClub = await getActiveClubCookie();
   if (!selectedClub) {
     return (
       <div className="flex-1 flex items-center justify-center text-gray-400 text-sm">
@@ -38,14 +23,11 @@ export default function DashboardPage() {
       </div>
     );
   }
+  const stats = await getDashboardStats(selectedClub);
+  const club = await getSelectedClub(selectedClub);
 
-  if (loading) {
-    return (
-      <div className="flex-1 flex items-center justify-center text-gray-400 text-sm">
-        Loading...
-      </div>
-    );
-  }
+
+
 
   if (!stats) {
     return (
@@ -64,7 +46,7 @@ export default function DashboardPage() {
               Welcome back
             </h1>
             <p className="text-gray-500 text-sm">
-              {selectedClub.club.name} -- {stats.totalMembers} members
+              {club?.name} -- {stats.totalMembers} members
             </p>
           </div>
 
@@ -96,7 +78,6 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Quick Actions + Fitting Day */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="bg-white border border-gray-200 rounded-xl p-6">
               <h2 className="text-lg font-semibold text-brand-navy mb-4">Quick Actions</h2>

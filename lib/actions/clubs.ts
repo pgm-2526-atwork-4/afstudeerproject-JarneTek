@@ -96,5 +96,6 @@ export async function updateClub(clubId: string, formData: FormData) {
     });
 
     revalidatePath("/dashboard");
+    revalidatePath("/dashboard/club-info");
     return { success: true };
 }
