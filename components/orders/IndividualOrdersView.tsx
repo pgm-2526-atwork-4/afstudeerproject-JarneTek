@@ -2,6 +2,7 @@
  
 import { useState } from "react";
 import Pagination from "../pagination/pagination";
+import SearchBar from "../ui/SearchBar";
 import { OrderWithDetails } from "@/types/orders";
  
 interface IndividualOrdersViewProps {
@@ -16,17 +17,34 @@ export default function IndividualOrdersView({
   togglingOrderId,
 }: IndividualOrdersViewProps) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
   const pageSize = 10;
  
-  const totalPages = Math.ceil(orders.length / pageSize);
-  const paginatedOrders = orders.slice(
+  const filteredOrders = orders.filter((order) => {
+    const fullName = `${order.member.firstName} ${order.member.lastName}`.toLowerCase();
+    return fullName.includes(searchQuery.toLowerCase());
+  });
+
+  const totalPages = Math.ceil(filteredOrders.length / pageSize) || 1;
+  const paginatedOrders = filteredOrders.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize,
   );
  
   return (
     <div className="space-y-4">
-      {orders.length === 0 ? (
+      <div className="flex justify-end">
+        <SearchBar
+          placeholder="Search by name..."
+          value={searchQuery}
+          onChange={(val) => {
+            setSearchQuery(val);
+            setCurrentPage(1);
+          }}
+          className="w-full sm:w-64"
+        />
+      </div>
+      {filteredOrders.length === 0 ? (
         <div className="bg-white border border-dashed border-gray-200 rounded-xl p-10 text-center text-gray-400 text-sm">
           No orders yet.
         </div>

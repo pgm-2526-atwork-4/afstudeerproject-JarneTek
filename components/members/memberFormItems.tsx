@@ -55,8 +55,8 @@ export default function MemberFormItems({
 
   if (!form) return <div>No form found.</div>;
 
-  const basicItems = form.items.filter((item: any) => item.type === "BASIC");
-  const customItems = form.items.filter((item: any) => item.type === "EXTRA");
+  const basicItems = form.items.filter((item) => item.type === "BASIC");
+  const customItems = form.items.filter((item) => item.type === "EXTRA");
 
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -154,7 +154,7 @@ export default function MemberFormItems({
       {activeTab === "basic" && (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-            {basicItems.map((item: any) => (
+            {basicItems.map((item) => (
               <KitItemCard onAdd={handleAddToCart} key={item.id} item={item} />
             ))}
           </div>
@@ -181,7 +181,7 @@ export default function MemberFormItems({
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-            {customItems.map((item: any) => (
+            {customItems.map((item) => (
               <KitItemCard onAdd={handleAddToCart} key={item.id} item={item} />
             ))}
           </div>

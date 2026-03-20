@@ -7,6 +7,7 @@ import ManualOrderPopUp from "./ManualOrderPopUp";
 import { toggleHasPaid } from "@/lib/actions/members";
 import { Member } from "@prisma/client";
 import Pagination from "../pagination/pagination";
+import SearchBar from "../ui/SearchBar";
 
 export default function MembersTable({
   initialMembers,
@@ -17,6 +18,7 @@ export default function MembersTable({
 }) {
   const [groups, setGroups] = useState<string[]>([]);
   const [groupFilter, setGroupFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [openPaidMenu, setOpenPaidMenu] = useState<string | null>(null);
   const [openActionMenu, setOpenActionMenu] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,12 +37,14 @@ export default function MembersTable({
     });
     setGroups(groups);
     setCurrentPage(1);
-  }, [initialMembers, groupFilter]);
+  }, [initialMembers, groupFilter, searchQuery]);
 
   const filteredMembers = initialMembers.filter(
-    (member) => groupFilter === "all" || member.group === groupFilter,
+    (m) =>
+      (groupFilter === "all" || m.group === groupFilter) &&
+      `${m.firstName} ${m.lastName} ${m.email}`.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  const totalPages = Math.ceil(filteredMembers.length / pageSize);
+  const totalPages = Math.ceil(filteredMembers.length / pageSize) || 1;
   const paginatedMembers = filteredMembers.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize,
@@ -48,23 +52,40 @@ export default function MembersTable({
 
   return (
     <div className="space-y-6">
-      <div className="bg-white border border-gray-200 rounded-xl p-4">
-        <label className="text-sm font-medium text-brand-navy block mb-1">
-          U-Group Selection
-        </label>
-        <select
-          name="groupFilter"
-          id="groupFilter"
-          onChange={(e) => setGroupFilter(e.target.value)}
-          className="w-60 border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-brand-green"
-        >
-          <option value="all">All Groups</option>
-          {groups.map((group) => (
-            <option key={group} value={group}>
-              {group}
-            </option>
-          ))}
-        </select>
+      <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col sm:flex-row gap-4 sm:items-end justify-between">
+        <div>
+          <label className="text-sm font-medium text-brand-navy block mb-1">
+            U-Group Selection
+          </label>
+          <select
+            name="groupFilter"
+            id="groupFilter"
+            onChange={(e) => setGroupFilter(e.target.value)}
+            className="w-full sm:w-60 border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-brand-green"
+          >
+            <option value="all">All Groups</option>
+            {groups.map((group) => (
+              <option key={group} value={group}>
+                {group}
+              </option>
+            ))}
+          </select>
+        </div>
+        
+        <div className="w-full sm:w-72">
+          <label className="text-sm font-medium text-brand-navy block mb-1">
+            Search Members
+          </label>
+          <SearchBar
+            value={searchQuery}
+            onChange={(val) => {
+              setSearchQuery(val);
+              setCurrentPage(1);
+            }}
+            placeholder="Search name or email..."
+            className="w-full"
+          />
+        </div>
       </div>
 
       {filteredMembers.length === 0 ? (

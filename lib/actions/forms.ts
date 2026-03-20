@@ -5,6 +5,7 @@ import {getSession} from "../auth";
 import {createFormSchema, addArticleToFormSchema} from "../validations/forms";
 import {revalidatePath} from "next/cache";
 import { defaultProductsData } from "../data/defaultProducts";
+import type { FormWithItems } from "@/types/forms";
 
 export async function getFormsByClubId(clubId: string) {
     const session = await getSession();
@@ -163,7 +164,7 @@ export async function updateForm(formId: string, formData: FormData) {
     return {success: "Form updated successfully", updatedForm};
 }
 
-export async function getFormWithItems(formId: string) {
+export async function getFormWithItems(formId: string): Promise<FormWithItems | null> {
     const session = await getSession();
     const userId = session?.id;
     if (!userId) return null;
@@ -191,13 +192,15 @@ export async function getFormWithItems(formId: string) {
     });
     if (!clubUser) return null;
 
-    return {
+    const formWithNumberPrices: FormWithItems = {
         ...form,
         items: form.items.map((item) => ({
             ...item,
             customPrice: item.customPrice ? Number(item.customPrice) : null,
         })),
     };
+
+    return formWithNumberPrices;
 }
 
 export async function createProductForForm(formId: string, formData: FormData) {

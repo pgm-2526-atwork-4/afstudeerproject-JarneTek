@@ -72,7 +72,7 @@ export default function ManualOrderModal({
                   !
                 </div>
                 <p className="text-gray-500 font-medium text-sm">
-                  No form found for this member's group.
+                  No form found for this member&apos;s group.
                 </p>
               </div>
             )}

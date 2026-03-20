@@ -2,16 +2,16 @@
 
 import { useState } from "react";
 import { updateFormItem } from "@/lib/actions/forms";
-import { FormItem, Product } from "@prisma/client";
 import { uploadImage } from "@/lib/actions/upload";
 import LoadingButton from "@/components/ui/LoadingButton";
+import type { FormItemWithProduct } from "@/types/forms";
 
 const ADULT_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 const KIDS_SIZES = ["104", "116", "128", "140", "152", "164"];
 
 type Props = {
   formItemId: string;
-  item: FormItem & { product: Product };
+  item: FormItemWithProduct;
 };
 
 export default function UpdateArticleModal({ formItemId, item }: Props) {

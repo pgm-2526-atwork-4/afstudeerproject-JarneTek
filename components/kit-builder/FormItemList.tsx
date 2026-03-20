@@ -1,13 +1,13 @@
 "use client";
 
-import { Form, FormItem, Product } from "@prisma/client";
+import type { FormWithItems } from "@/types/forms";
 import UpdateArticleModal from "./UpdateArticleModal";
 import DeleteFormItem from "./DeleteFormItem";
 
 export default function FormItemList({
   form,
 }: {
-  form: Form & { items: (FormItem & { product: Product })[] };
+  form: FormWithItems;
 }) {
   return (
     <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-3">

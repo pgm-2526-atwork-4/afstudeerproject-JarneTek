@@ -1,11 +1,11 @@
 "use client";
 
-import { FormItem, Product } from "@prisma/client";
+import type { FormItemWithProduct } from "@/types/forms";
 
 type Props = {
   title: string;
   subtitle: string;
-  items: (FormItem & { product: Product })[];
+  items: FormItemWithProduct[];
 };
 
 export default function FormItemPreviewSection({

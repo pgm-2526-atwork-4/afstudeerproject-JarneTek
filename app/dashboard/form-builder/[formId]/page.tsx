@@ -2,6 +2,7 @@ import { getFormWithItems } from "@/lib/actions/forms";
 import AddArticleModal from "@/components/kit-builder/AddArticleModal";
 import FormItemList from "@/components/kit-builder/FormItemList";
 import FormItemPreviewSection from "@/components/kit-builder/FormItemPreviewSection";
+import Link from "next/link";
 
 export default async function FormDetailPage({
   params,
@@ -67,9 +68,9 @@ export default async function FormDetailPage({
               </div>
             </div>
           </div>
-          <button className="bg-brand-navy text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-green transition-colors">
-            Save Kit
-          </button>
+          <Link href="/dashboard/form-builder" className="bg-brand-navy text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-green transition-colors inline-block">
+            Back to Overview
+          </Link>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6">

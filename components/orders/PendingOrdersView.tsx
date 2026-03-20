@@ -2,6 +2,7 @@
  
 import { useState } from "react";
 import Pagination from "../pagination/pagination";
+import SearchBar from "../ui/SearchBar";
 import { OrderWithDetails } from "@/types/orders";
  
 interface PendingOrdersViewProps {
@@ -20,26 +21,43 @@ export default function PendingOrdersView({
   confirmError,
 }: PendingOrdersViewProps) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
   const pageSize = 10;
  
-  const totalPages = Math.ceil(orders.length / pageSize);
-  const paginatedOrders = orders.slice(
+  const filteredOrders = orders.filter((order) => {
+    const fullName = `${order.member.firstName} ${order.member.lastName}`.toLowerCase();
+    return fullName.includes(searchQuery.toLowerCase());
+  });
+
+  const totalPages = Math.ceil(filteredOrders.length / pageSize) || 1;
+  const paginatedOrders = filteredOrders.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize,
   );
  
   return (
     <div className="space-y-4">
-      <p className="text-sm text-gray-500">
-        Click <span className="font-medium text-brand-navy">Set to confirmed</span> to change an order status.
-      </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <p className="text-sm text-gray-500">
+          Click <span className="font-medium text-brand-navy">Set to confirmed</span> to change an order status.
+        </p>
+        <SearchBar
+          placeholder="Search by name..."
+          value={searchQuery}
+          onChange={(val) => {
+            setSearchQuery(val);
+            setCurrentPage(1); // Reset to page 1 on search
+          }}
+          className="w-full sm:w-64"
+        />
+      </div>
       {confirmMessage && (
         <div className="text-sm text-green-700">{confirmMessage}</div>
       )}
       {confirmError && (
         <div className="text-sm text-red-600">{confirmError}</div>
       )}
-      {orders.length === 0 ? (
+      {filteredOrders.length === 0 ? (
         <div className="bg-white border border-dashed border-gray-200 rounded-xl p-10 text-center text-gray-400 text-sm">
           No pending orders.
         </div>

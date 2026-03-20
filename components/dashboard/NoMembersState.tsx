@@ -30,7 +30,7 @@ export default function NoMembersState({ clubName, onMembersImported }: NoMember
 
         <h2 className="text-2xl font-bold text-brand-navy mb-3">Start with your members</h2>
         <p className="text-gray-500 mb-8 leading-relaxed">
-          You haven't added any members to{" "}
+          You haven&apos;t added any members to{" "}
           <span className="font-semibold text-brand-navy">
             {clubName || "your club"}
           </span>
