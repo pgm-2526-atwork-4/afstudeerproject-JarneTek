@@ -25,10 +25,9 @@ export async function getClubMembers(clubId: string) {
         where: {
             clubId: clubId,
         },
-        orderBy: [
-            { createdAt: 'asc' },
-            { id: 'asc' }
-        ],
+        orderBy: {
+            id: 'asc',
+        },
     });
     revalidatePath(`/dashboard/form-builder`);
     return members;
@@ -123,10 +122,7 @@ export async function getMemberFormItemsFromToken(token: string) {
         },
         include: {
             items: {
-                orderBy: [
-                    { createdAt: 'asc' },
-                    { id: 'asc' }
-                ],
+                orderBy: { id: 'asc' },
                 include: { product: true },
             },
         },

@@ -40,7 +40,7 @@ export default function AddArticleModal({ formId }: Props) {
     formData.set("sizes", selectedSizes.join(","));
     const result = await createProductForForm(formId, formData);
     if (result && "error" in result) {
-      setError(result.error);
+      setError(result.error ?? "An unknown error occurred.");
       return;
     }
     setIsModalOpen(false);

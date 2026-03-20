@@ -48,15 +48,11 @@ export default function UpdateArticleModal({ formItemId, item }: Props) {
     formData.set("sizes", selectedSizes.join(","));
     const result = await updateFormItem(formItemId, formData);
     if (result && "error" in result) {
-      setError(result.error);
+      setError(result.error ?? "An unknown error occurred.");
       return;
     }
     setIsModalOpen(false);
     setError(null);
-    setSelectedSizes(ADULT_SIZES);
-    setArticleType("BASIC");
-    setImagePreview(null);
-    setProductName(item.product.name);
   };
 
   return (

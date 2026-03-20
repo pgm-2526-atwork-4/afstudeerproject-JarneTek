@@ -27,10 +27,9 @@ export async function getFormsByClubId(clubId: string) {
         where: {
             clubId,
         },
-        orderBy: [
-            { createdAt: 'asc' },
-            { id: 'asc' }
-        ],
+        orderBy: {
+            id: 'asc',
+        },
     });
 }
 
@@ -173,10 +172,7 @@ export async function getFormWithItems(formId: string) {
         where: { id: formId },
         include: {
             items: {
-                orderBy: [
-                    { createdAt: 'asc' },
-                    { id: 'asc' }
-                ],
+                orderBy: { id: 'asc' },
                 include: {
                     product: true,
                 },
@@ -263,7 +259,10 @@ export async function createProductForForm(formId: string, formData: FormData) {
         },
     });
     revalidatePath(`/dashboard/form-builder/${formId}`);
-    return formItem;
+    return {
+        ...formItem,
+        customPrice: formItem.customPrice ? Number(formItem.customPrice) : null,
+    };
 }
 
 export async function updateFormItem(formItemId: string, formData: FormData) {
@@ -327,7 +326,10 @@ await prisma.product.update({
         },
     });
     revalidatePath(`/dashboard/form-builder/${formItem.formId}`);
-    return updatedFormItem;
+    return {
+        ...updatedFormItem,
+        customPrice: updatedFormItem.customPrice ? Number(updatedFormItem.customPrice) : null,
+    };
 }
 
 export async function deleteForm(formId: string) {
@@ -431,10 +433,7 @@ export async function getFormItemsForMember(memberId: string) {
         },
         include: {
             items: {
-                orderBy: [
-                    { createdAt: 'asc' },
-                    { id: 'asc' }
-                ],
+                orderBy: { id: 'asc' },
                 include: {
                     product: true,
                 },
