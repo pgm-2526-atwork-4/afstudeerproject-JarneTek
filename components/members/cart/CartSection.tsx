@@ -153,7 +153,8 @@ export default function CartSection({
 
             <LoadingButton
               onClick={handleCheckout}
-              disabled={isSubmitting}
+              isLoading={isSubmitting}
+              loadingText="Placing order..."
               style={{
                 backgroundColor: "#0f172a",
                 color: "#ffffff",
@@ -161,7 +162,7 @@ export default function CartSection({
               }}
               className="w-full py-4 rounded-xl text-sm font-black uppercase tracking-wider hover:bg-[#1e293b] transition-all shadow-md active:scale-[0.98] disabled:opacity-50"
             >
-              {isSubmitting ? "Placing order..." : "Place Order"}
+              Place Order
             </LoadingButton>
           </div>
         )}

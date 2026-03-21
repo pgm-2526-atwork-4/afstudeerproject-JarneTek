@@ -21,7 +21,7 @@ export default function FormItemPreviewSection({
         <h2 className="font-bold text-brand-navy">{title}</h2>
         <p className="text-xs text-brand-green">{subtitle}</p>
       </div>
-      <div className="grid gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {items.map((item) => (
           <div
             key={item.id}

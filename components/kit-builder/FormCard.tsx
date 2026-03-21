@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Form } from "@prisma/client";
 import { updateForm, deleteForm } from "@/lib/actions/forms";
 import { useState } from "react";
+import LoadingButton from "../ui/LoadingButton";
 
 type FormCardProps = {
   form: Form;
@@ -17,6 +18,7 @@ export default function FormCard({ form, allGroups }: FormCardProps) {
   );
   const [error, setError] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleCheckbox = (group: string) => {
     if (selectedGroups.includes(group)) {
@@ -27,7 +29,9 @@ export default function FormCard({ form, allGroups }: FormCardProps) {
   };
 
   const handleDeleteForm = async () => {
+    setIsDeleting(true);
     const result = await deleteForm(form.id);
+    setIsDeleting(false);
     if (result?.error) {
       setError(result.error);
       return;
@@ -140,12 +144,13 @@ export default function FormCard({ form, allGroups }: FormCardProps) {
                 >
                   Cancel
                 </button>
-                <button
+                <LoadingButton
                   type="submit"
+                  loadingText="Updating..."
                   className="bg-brand-navy text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-green transition-colors"
                 >
                   Update
-                </button>
+                </LoadingButton>
               </div>
             </form>
           </div>
@@ -176,17 +181,20 @@ export default function FormCard({ form, allGroups }: FormCardProps) {
               <button
                 type="button"
                 onClick={() => setShowDeleteModal(false)}
-                className="flex-1 border border-gray-200 text-gray-600 px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+                className="flex-1 border border-gray-200 text-gray-600 px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+                disabled={isDeleting}
               >
                 Cancel
               </button>
-              <button
+              <LoadingButton
                 type="button"
                 onClick={handleDeleteForm}
+                isLoading={isDeleting}
+                loadingText="Deleting..."
                 className="flex-1 bg-red-500 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors"
               >
                 Delete
-              </button>
+              </LoadingButton>
             </div>
           </div>
         </div>

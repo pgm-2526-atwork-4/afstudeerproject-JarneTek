@@ -4,6 +4,7 @@ import { updateClub } from "@/lib/actions/clubs";
 import { useState } from "react";
 import { Club } from "@prisma/client";
 import { useClub } from "@/providers/clubprovider";
+import LoadingButton from "../ui/LoadingButton";
 
 export default function ClubInfoForm({ club }: { club: Club }) {
   const { refreshClubs } = useClub();
@@ -105,12 +106,13 @@ export default function ClubInfoForm({ club }: { club: Club }) {
           />
         </div>
 
-        <button
+        <LoadingButton
           type="submit"
+          loadingText="Saving..."
           className="bg-brand-navy text-white px-6 py-2 rounded-lg text-sm hover:bg-brand-green transition-colors"
         >
           Save Changes
-        </button>
+        </LoadingButton>
       </form>
     </div>
   );

@@ -4,6 +4,7 @@ import { startFittingDay } from "@/lib/actions/fittingDay";
 import { useClub } from "@/providers/clubprovider";
 import { Form } from "@prisma/client";
 import { getFormsByClubId } from "@/lib/actions/forms";
+import LoadingButton from "../ui/LoadingButton";
 
 export default function StartFittingDayModal() {
   const [open, setOpen] = useState(false);
@@ -179,13 +180,14 @@ export default function StartFittingDayModal() {
                 >
                   Cancel
                 </button>
-                <button
+                <LoadingButton
                   type="submit"
                   disabled={!selectedForm}
+                  loadingText="Starting..."
                   className="bg-brand-navy text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-green transition-colors disabled:opacity-50"
                 >
                   Start Fitting Day
-                </button>
+                </LoadingButton>
               </div>
             </form>
           </div>

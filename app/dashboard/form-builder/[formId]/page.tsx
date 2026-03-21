@@ -80,7 +80,7 @@ export default async function FormDetailPage({
               <p>Add articles to see the member preview.</p>
             </div>
           ) : (
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm w-full max-w-xl mx-auto p-8 space-y-8">
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm w-full max-w-3xl mx-auto p-8 space-y-8">
               <div>
                 <h1 className="text-2xl font-bold text-brand-navy">
                   Select Your Kit

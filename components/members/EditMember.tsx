@@ -3,6 +3,7 @@
 import { updateMember } from "@/lib/actions/members";
 import { Member } from "@prisma/client";
 import { useState } from "react";
+import LoadingButton from "../ui/LoadingButton";
 
 export default function EditMember({ member }: { member: Member }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -131,12 +132,13 @@ export default function EditMember({ member }: { member: Member }) {
                 >
                   Cancel
                 </button>
-                <button
+                <LoadingButton
                   type="submit"
+                  loadingText="Saving..."
                   className="flex-1 px-4 py-2 bg-brand-green text-white rounded-lg hover:bg-green-600 transition-colors"
                 >
                   Save
-                </button>
+                </LoadingButton>
               </div>
             </form>
           </div>

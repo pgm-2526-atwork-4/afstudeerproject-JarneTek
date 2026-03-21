@@ -2,6 +2,7 @@
 
 import { deleteFormItem } from "@/lib/actions/forms";
 import { useState } from "react";
+import LoadingButton from "../ui/LoadingButton";
 
 type Props = {
   formItemId: string;
@@ -10,6 +11,7 @@ type Props = {
 export default function DeleteFormItem({ formItemId }: Props) {
   const [modalOpen, setModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   return (
     <>
@@ -43,23 +45,28 @@ export default function DeleteFormItem({ formItemId }: Props) {
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setModalOpen(false)}
-                className="bg-gray-200 px-4 py-2 rounded-lg"
+                className="bg-gray-200 px-4 py-2 rounded-lg disabled:opacity-50"
+                disabled={isDeleting}
               >
                 Cancel
               </button>
-              <button
+              <LoadingButton
                 onClick={async () => {
+                  setIsDeleting(true);
                   const result = await deleteFormItem(formItemId);
+                  setIsDeleting(false);
                   if (result?.error) {
                     setError(result.error);
                     return;
                   }
                   setModalOpen(false);
                 }}
+                isLoading={isDeleting}
+                loadingText="Deleting..."
                 className="bg-red-500 text-white px-4 py-2 rounded-lg"
               >
                 Delete
-              </button>
+              </LoadingButton>
             </div>
           </div>
         </div>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { deleteMember } from "@/lib/actions/members";
+import LoadingButton from "../ui/LoadingButton";
 
 export default function DeleteMember({
   memberId,
@@ -12,9 +13,12 @@ export default function DeleteMember({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
+    setIsDeleting(true);
     const result = await deleteMember(memberId);
+    setIsDeleting(false);
     if (result?.error) {
       setError(result.error);
     } else {
@@ -48,17 +52,20 @@ export default function DeleteMember({
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-50"
+                disabled={isDeleting}
               >
                 Cancel
               </button>
-              <button
+              <LoadingButton
                 type="button"
                 onClick={handleDelete}
+                isLoading={isDeleting}
+                loadingText="Deleting..."
                 className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
               >
                 Delete
-              </button>
+              </LoadingButton>
             </div>
           </div>
         </div>

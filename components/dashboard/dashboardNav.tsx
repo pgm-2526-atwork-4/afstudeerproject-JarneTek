@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { logout } from "@/lib/actions/logout";
 import ClubSelector from "../clubs/clubSelector";
 import { useState, useEffect } from "react";
+import LoadingButton from "../ui/LoadingButton";
 
 const navItems = [
   {
@@ -121,12 +122,13 @@ export default function DashboardNav() {
 
           <div className="mt-8 border-t border-brand-navy-light pt-4">
             <form action={logout}>
-              <button
+              <LoadingButton
                 type="submit"
+                loadingText="Logging out..."
                 className="flex items-center gap-2 text-gray-400 hover:text-white text-sm w-full p-2 rounded transition-colors focus:outline-none"
               >
                 <span>←</span> Logout
-              </button>
+              </LoadingButton>
             </form>
           </div>
         </div>
