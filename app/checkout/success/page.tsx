@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { createQrCode } from "@/lib/helpers/cart";
 import { Decimal } from "@prisma/client/runtime/library";
 import { QRCodeSVG } from "qrcode.react";
+import CopyIbanButton from "@/components/checkout/CopyIbanButton";
 
 export default async function CheckoutSuccessPage({searchParams}: {searchParams: {token?: string, orderId?: string}}) {
 
@@ -79,17 +80,10 @@ export default async function CheckoutSuccessPage({searchParams}: {searchParams:
               </div>
             </div>
             <p className="text-xs text-gray-400 mt-3">
-              On mobile? Tap the button below instead.
+              On mobile? Copy the IBAN and pay via your banking app.
             </p>
             <div className="mt-3">
-              <a
-                href={`https://payconiq.com/t/1/${iban!.replace(/\s/g, "")}?A=${formattedTotal}&D=${encodeURIComponent(reference)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block bg-brand-navy text-white text-sm font-bold px-6 py-3 rounded-xl hover:bg-brand-navy/90 transition-all shadow-md"
-              >
-                💳 Tap to pay EUR {formattedTotal}
-              </a>
+              <CopyIbanButton iban={iban!} />
             </div>
             <div className="mt-6 space-y-1 text-sm text-gray-600">
               <p>Club: {clubName}</p>
