@@ -78,9 +78,23 @@ export default async function CheckoutSuccessPage({searchParams}: {searchParams:
                 <QRCodeSVG value={qrCode} size={240} includeMargin />
               </div>
             </div>
+            <p className="text-xs text-gray-400 mt-3">
+              On mobile? Tap the button below instead.
+            </p>
+            <div className="mt-3">
+              <a
+                href={`https://payconiq.com/t/1/${iban!.replace(/\s/g, "")}?A=${formattedTotal}&D=${encodeURIComponent(reference)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block bg-brand-navy text-white text-sm font-bold px-6 py-3 rounded-xl hover:bg-brand-navy/90 transition-all shadow-md"
+              >
+                💳 Tap to pay EUR {formattedTotal}
+              </a>
+            </div>
             <div className="mt-6 space-y-1 text-sm text-gray-600">
               <p>Club: {clubName}</p>
               <p>Amount: EUR {formattedTotal}</p>
+              <p>IBAN: {iban}</p>
               <p className="break-all">Reference: {reference}</p>
             </div>
           </>
