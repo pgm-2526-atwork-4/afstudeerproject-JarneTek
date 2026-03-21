@@ -48,6 +48,22 @@ export default function NewClubForm() {
               className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-brand-green focus:outline-none"
             />
           </div>
+
+          <div className="space-y-1">
+            <label
+              htmlFor="file"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Club Logo (Optional)
+            </label>
+            <input
+              type="file"
+              name="file"
+              id="file"
+              accept="image/*"
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-brand-green focus:outline-none bg-white"
+            />
+          </div>
         </div>
       </div>
  

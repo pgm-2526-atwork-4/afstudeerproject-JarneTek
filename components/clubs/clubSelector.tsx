@@ -29,8 +29,12 @@ export default function ClubSelector() {
         onClick={() => setIsOpen(!isOpen)}
         className="w-full bg-brand-navy-light rounded p-3 text-sm flex items-center gap-3 text-white hover:bg-white/5 transition-colors"
       >
-        <div className="w-8 h-8 rounded bg-brand-green flex items-center justify-center text-xs font-bold shrink-0">
-          {selectedClub.club.name.substring(0, 2).toUpperCase()}
+        <div className="w-8 h-8 rounded bg-brand-green overflow-hidden flex items-center justify-center text-xs font-bold shrink-0">
+          {selectedClub.club.logoUrl ? (
+            <img src={selectedClub.club.logoUrl} alt={selectedClub.club.name} className="w-full h-full object-cover" />
+          ) : (
+            selectedClub.club.name.substring(0, 2).toUpperCase()
+          )}
         </div>
         <div className="flex-1 text-left font-semibold truncate">
           {selectedClub.club.name}
@@ -59,8 +63,12 @@ export default function ClubSelector() {
                   }}
                   className={`w-full px-3 py-2.5 flex items-center gap-3 text-sm transition-colors ${selectedClub.id === c.id ? "bg-white/10 text-white" : "text-gray-300 hover:bg-white/5 hover:text-white"}`}
                 >
-                  <div className="w-6 h-6 rounded bg-brand-green/20 flex items-center justify-center text-[10px] font-bold shrink-0 text-brand-green">
-                    {c.club.name.substring(0, 2).toUpperCase()}
+                  <div className="w-6 h-6 rounded overflow-hidden bg-brand-green/20 flex items-center justify-center text-[10px] font-bold shrink-0 text-brand-green">
+                    {c.club.logoUrl ? (
+                      <img src={c.club.logoUrl} alt={c.club.name} className="w-full h-full object-cover" />
+                    ) : (
+                      c.club.name.substring(0, 2).toUpperCase()
+                    )}
                   </div>
                   <span className="truncate">{c.club.name}</span>
                 </button>

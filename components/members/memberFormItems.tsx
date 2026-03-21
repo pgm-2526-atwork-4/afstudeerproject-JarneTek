@@ -32,6 +32,7 @@ export default function MemberFormItems({
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showExtraPopup, setShowExtraPopup] = useState(false);
+  const [hasSeenExtrasPopup, setHasSeenExtrasPopup] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
@@ -71,8 +72,14 @@ export default function MemberFormItems({
   const handleCheckout = async () => {
     if (cartItems.length === 0) return;
 
-    if (!hideExtrasPopup && hasExtrasAvailable && !hasExtrasInCart) {
+    if (
+      !hideExtrasPopup &&
+      hasExtrasAvailable &&
+      !hasExtrasInCart &&
+      !hasSeenExtrasPopup
+    ) {
       setShowExtraPopup(true);
+      setHasSeenExtrasPopup(true);
       return;
     }
 
@@ -136,7 +143,10 @@ export default function MemberFormItems({
         {hasExtrasAvailable && (
           <button
             type="button"
-            onClick={() => setActiveTab("extra")}
+            onClick={() => {
+              setActiveTab("extra");
+              setHasSeenExtrasPopup(true);
+            }}
             className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${
               activeTab === "extra"
                 ? "bg-white text-brand-navy shadow-sm"

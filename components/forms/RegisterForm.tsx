@@ -7,6 +7,7 @@ import LoadingButton from "@/components/ui/LoadingButton";
 
 export default function RegisterForm() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (formData: FormData) => {
     setFieldErrors({});
@@ -54,14 +55,23 @@ export default function RegisterForm() {
           >
             Password
           </label>
-          <input
-            id="password"
-            type="password"
-            name="password"
-            placeholder="••••••••"
-            className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green outline-none transition-all placeholder:text-gray-400 text-sm ${fieldErrors.password ? "border-red-400" : "border-gray-300"}`}
-            required
-          />
+          <div className="relative">
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="••••••••"
+              className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green outline-none transition-all placeholder:text-gray-400 text-sm pr-14 ${fieldErrors.password ? "border-red-400" : "border-gray-300"}`}
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-brand-green hover:underline focus:outline-none"
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
+          </div>
           {fieldErrors.password && (
             <p className="text-red-500 text-xs mt-1">
               {fieldErrors.password[0]}

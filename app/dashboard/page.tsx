@@ -3,7 +3,7 @@
 import { getDashboardStats } from "@/lib/actions/dashboard";
 import Link from "next/link";
 import StartFittingDayModal from "@/components/dashboard/startFittingDayModal";
-import { getActiveClubCookie, getSelectedClub } from "@/lib/actions/active-club";
+import { getActiveClubCookie } from "@/lib/actions/active-club";
 
 
 const STATUS_COLORS: Record<string, string> = {
@@ -24,7 +24,6 @@ export default async function DashboardPage() {
     );
   }
   const stats = await getDashboardStats(selectedClub);
-  const club = await getSelectedClub(selectedClub);
 
 
 
@@ -46,7 +45,7 @@ export default async function DashboardPage() {
               Welcome back
             </h1>
             <p className="text-gray-500 text-sm">
-              {club?.name} -- {stats.totalMembers} members
+              {stats.clubName} — {stats.totalMembers} members
             </p>
           </div>
 
@@ -70,8 +69,8 @@ export default async function DashboardPage() {
               </p>
             </div>
             <div className="bg-white border border-gray-200 rounded-xl p-5">
-              <p className="text-sm text-gray-400">Revenue</p>
-              <p className="text-2xl font-bold text-brand-navy mt-1">EUR {stats.totalRevenue.toFixed(2)}</p>
+              <p className="text-sm text-gray-400">Total Collected</p>
+              <p className="text-2xl font-bold text-brand-navy mt-1">EUR {stats.totalCollected.toFixed(2)}</p>
               <p className="text-xs text-gray-400 mt-1">
                 {stats.activeForms} active kit form{stats.activeForms !== 1 ? "s" : ""}
               </p>

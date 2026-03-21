@@ -36,7 +36,7 @@ export async function registerUser(email: string, password: string, clubName: st
 
     const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "7d" });
 
-    return { user, token };
+    return { user, token, clubId: club.id };
 }
 
 export async function loginUser(email: string, password: string) {

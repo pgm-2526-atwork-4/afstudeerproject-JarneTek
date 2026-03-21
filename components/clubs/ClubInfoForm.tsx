@@ -59,6 +59,23 @@ export default function ClubInfoForm({ club }: { club: Club }) {
 
         <div className="space-y-1">
           <label className="text-sm font-medium text-brand-navy">
+            Club Logo (Optional)
+          </label>
+          {club.logoUrl && (
+            <div className="mb-2">
+              <img src={club.logoUrl} alt="Club Logo" className="w-16 h-16 object-contain rounded-lg border border-gray-200 bg-gray-50 p-1" />
+            </div>
+          )}
+          <input
+            type="file"
+            name="file"
+            accept="image/*"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-brand-green"
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-brand-navy">
             Primary Color
           </label>
           <div className="flex items-center gap-3">

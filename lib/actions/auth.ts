@@ -49,7 +49,7 @@ export async function register(formData: FormData) {
         : null;
 
     try {
-        const { token } = await registerUser(parsed.data.email, parsed.data.password, parsed.data.clubName, formattedIban);
+        const { token, clubId } = await registerUser(parsed.data.email, parsed.data.password, parsed.data.clubName, formattedIban);
         
         cookies().set("token", token, {
             httpOnly: true,
@@ -57,6 +57,14 @@ export async function register(formData: FormData) {
             sameSite: "strict",
             maxAge: 60 * 60,
             path: "/",
+        });
+
+        cookies().set("activeClub", clubId, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            path: "/",
+            maxAge: 60 * 60 * 24 * 30,
         });
     } catch (error: unknown) {
         if (error instanceof Error && error.message === "User already exists") {

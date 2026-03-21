@@ -28,5 +28,6 @@ export type ClubEntry = {
         primaryColor: string;
         secondaryColor: string | null;
         iban: string | null;
+        logoUrl: string | null;
     };
 };

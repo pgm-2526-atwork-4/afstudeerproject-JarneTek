@@ -4,6 +4,7 @@ import { getSession } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClubSchema } from "@/lib/validations/clubs";
+import { uploadImage } from "./upload";
 
 export async function getUserClubs() {
     const session = await getSession();
@@ -36,8 +37,17 @@ export async function createClub(formData: FormData): Promise<{ error: string } 
         return { error: parsed.error.issues[0].message };
     }
 
-    const { name, primaryColor, secondaryColor } = parsed.data;
+    const { name, primaryColor, secondaryColor, iban } = parsed.data;
     const slug = name.toLowerCase().replace(/\s+/g, "-");
+
+    let logoUrl = undefined;
+    const logoFile = formData.get("file") as File | null;
+    if (logoFile && logoFile.size > 0) {
+        const uploadedUrl = await uploadImage(formData);
+        if (uploadedUrl) {
+            logoUrl = uploadedUrl;
+        }
+    }
 
     const club = await prisma.club.create({
         data: {
@@ -45,6 +55,8 @@ export async function createClub(formData: FormData): Promise<{ error: string } 
             slug,
             primaryColor,
             secondaryColor,
+            iban,
+            ...(logoUrl && { logoUrl }),
         },
     });
     await prisma.clubUser.create({
@@ -84,6 +96,15 @@ export async function updateClub(clubId: string, formData: FormData) {
 
     const slug = parsed.data.name.toLowerCase().replace(/\s+/g, "-");
 
+    let logoUrl = undefined;
+    const logoFile = formData.get("file") as File | null;
+    if (logoFile && logoFile.size > 0) {
+        const uploadedUrl = await uploadImage(formData);
+        if (uploadedUrl) {
+            logoUrl = uploadedUrl;
+        }
+    }
+
     await prisma.club.update({
         where: { id: clubId },
         data: {
@@ -92,6 +113,7 @@ export async function updateClub(clubId: string, formData: FormData) {
             primaryColor: parsed.data.primaryColor,
             secondaryColor: parsed.data.secondaryColor,
             iban: parsed.data.iban,
+            ...(logoUrl && { logoUrl }),
         },
     });
 
