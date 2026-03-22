@@ -46,13 +46,7 @@ export default function DashboardNav() {
   return (
     <>
       <div className="md:hidden flex items-center justify-between p-4 bg-brand-navy text-white shrink-0">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-brand-green rounded flex items-center justify-center font-bold">
-            K
-          </div>
-          <span className="font-bold text-lg">KitStack</span>
-        </div>
-        <button onClick={() => setIsOpen(!isOpen)} className="p-2 -mr-2 focus:outline-none">
+        <button onClick={() => setIsOpen(!isOpen)} className="p-2 -ml-2 focus:outline-none">
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             {isOpen ? (
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -61,6 +55,12 @@ export default function DashboardNav() {
             )}
           </svg>
         </button>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-brand-green rounded flex items-center justify-center font-bold">
+            K
+          </div>
+          <span className="font-bold text-lg">KitStack</span>
+        </div>
       </div>
 
       {isOpen && (
