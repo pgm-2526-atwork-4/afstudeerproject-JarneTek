@@ -24,7 +24,6 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@mermaid-js/mermaid-cli": "^11.12.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
@@ -35,7 +34,6 @@
     "eslint-config-next": "14.2.35",
     "postcss": "^8",
     "prisma": "^6.19.2",
-    "prisma-erd-generator": "^2.4.2",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   },
